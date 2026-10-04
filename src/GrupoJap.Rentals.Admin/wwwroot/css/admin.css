@@ -1,0 +1,35 @@
+/* =========================================================
+   Estilos exclusivos da administração (página de Traduções).
+   Usa os tokens de site.css, por isso acompanha o modo noturno.
+   ========================================================= */
+
+.translation-filters { display: grid; grid-template-columns: minmax(220px, 2fr) minmax(160px, 1fr) auto auto; align-items: end; gap: 14px; margin-bottom: 16px; padding: 16px 18px; }
+.translation-missing { min-height: 38px; }
+.translation-filter-actions { display: flex; gap: 8px; }
+.missing-count { display: inline-grid; min-width: 20px; height: 20px; place-items: center; padding: 0 6px; border-radius: 999px; background: var(--red-wash); color: var(--red); font-size: 10px; font-weight: 700; }
+
+.translation-table td { vertical-align: top; }
+.translation-key-cell { min-width: 220px; max-width: 280px; }
+.translation-key { display: inline-block; padding: 2px 6px; border-radius: 4px; background: var(--canvas); color: var(--green); font-family: "DM Mono", monospace; font-size: 11px; word-break: break-all; }
+.translation-key-cell small { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; color: var(--muted); font-size: 10px; }
+.category-chip { padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--ink-soft); }
+.translation-value { max-width: 260px; font-size: 12px; color: var(--ink); }
+.translation-value span[title] { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-height: 1.45; }
+.missing-badge { display: inline-block; padding: 3px 8px; border-radius: 999px; background: var(--red-wash); color: var(--red); font-size: 10px; font-weight: 700; }
+.lang-badge { display: inline-grid; min-width: 24px; place-items: center; padding: 1px 4px; border-radius: 4px; background: var(--green-dark); color: #fff; font-family: "DM Mono", monospace; font-size: 9px; }
+
+.admin-pagination > div { display: flex; gap: 8px; }
+
+.translation-languages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.translation-language textarea { min-height: 96px; padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: 5px; background: var(--surface); color: var(--ink); font: inherit; font-size: 13px; line-height: 1.45; resize: vertical; }
+.translation-language textarea:focus { outline: 2px solid var(--green); outline-offset: 1px; }
+.field-hint { color: var(--muted); font-size: 11px; }
+.field-hint span { color: var(--ink-soft); }
+.text-button { padding: 0; border: 0; background: none; color: var(--green); font: inherit; font-weight: 700; cursor: pointer; }
+.text-button:hover { text-decoration: underline; }
+
+@media (max-width: 1100px) {
+  .translation-filters { grid-template-columns: 1fr 1fr; }
+  .translation-languages { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) { .translation-filters { grid-template-columns: 1fr; } }

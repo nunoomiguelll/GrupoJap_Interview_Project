@@ -1,0 +1,31 @@
+@model Translation
+@using GrupoJap.Rentals.Localization
+@{ ViewData["Title"] = "Eliminar tradução"; bool isCatalogKey = ViewBag.IsCatalogKey; }
+
+<section class="management-page">
+    <div class="page-heading management-heading">
+        <div><p class="eyebrow">TRADUÇÕES <span>·</span> ELIMINAR</p><h1>Eliminar tradução</h1></div>
+    </div>
+    <div class="panel confirm-panel">
+        <dl>
+            <dt>Chave</dt><dd><code class="translation-key">@Model.Key</code></dd>
+            <dt>Categoria</dt><dd>@Model.Category</dd>
+            @foreach (var language in SiteLanguages.All)
+            {
+                <dt>@language.Name</dt><dd>@(Model.Values.FirstOrDefault(v => v.Language == language.Code)?.Value is { Length: > 0 } value ? value : "—")</dd>
+            }
+        </dl>
+        @if (isCatalogKey)
+        {
+            <div class="notice notice-success" role="status">Este texto é usado no site. Ao eliminar, o site volta a mostrar o texto original e a tradução é recriada com os valores originais no próximo arranque. Na prática, funciona como "repor".</div>
+        }
+        else
+        {
+            <p>Tens a certeza que queres eliminar esta tradução? Se ainda estiver a ser usada numa vista, o site passa a mostrar a chave.</p>
+        }
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="form-actions">
+            <a class="secondary-button" asp-action="Index">Cancelar</a>
+            <button class="danger-button" type="submit">Eliminar</button>
+        </form>
+    </div>
+</section>

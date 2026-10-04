@@ -1,0 +1,122 @@
+@model GrupoJap.Rentals.ViewModels.TranslationIndexViewModel
+@using GrupoJap.Rentals.Localization
+@{
+    ViewData["Title"] = "Traduções";
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+
+    Dictionary<string, string?> RouteFor(int page) => new()
+    {
+        ["q"] = Model.Q,
+        ["category"] = Model.Category,
+        ["onlyMissing"] = Model.OnlyMissing ? "true" : null,
+        ["page"] = page == 1 ? null : page.ToString()
+    };
+}
+
+<section class="management-page">
+    <div class="page-heading management-heading">
+        <div>
+            <p class="eyebrow">SISTEMA <span>·</span> TRADUÇÕES</p>
+            <h1>Traduções do site</h1>
+            <p class="heading-copy">@Model.TotalCount texto(s) · edita aqui o que aparece no site público em português, inglês e espanhol.</p>
+        </div>
+        <a class="primary-button" asp-action="Create" asp-route-category="@Model.Category"><span aria-hidden="true">＋</span> Nova tradução</a>
+    </div>
+
+    <partial name="_Notices" />
+
+    <form method="get" asp-action="Index" class="panel translation-filters">
+        <div class="field-group translation-search">
+            <label for="q">Pesquisar</label>
+            <input id="q" type="search" name="q" value="@Model.Q" placeholder="Chave, texto ou descrição" autocomplete="off" />
+        </div>
+        <div class="field-group">
+            <label for="category">Categoria</label>
+            <select id="category" name="category" onchange="this.form.submit()">
+                <option value="">Todas</option>
+                @foreach (var category in Model.Categories)
+                {
+                    <option value="@category" selected="@(category == Model.Category)">@category</option>
+                }
+            </select>
+        </div>
+        <label class="check-row translation-missing">
+            <input type="checkbox" name="onlyMissing" value="true" checked="@Model.OnlyMissing" onchange="this.form.submit()" />
+            Só incompletas
+            @if (Model.MissingCount > 0)
+            {
+                <span class="missing-count">@Model.MissingCount</span>
+            }
+        </label>
+        <div class="translation-filter-actions">
+            <button class="primary-button" type="submit">Filtrar</button>
+            <a class="secondary-button" asp-action="Index">Limpar</a>
+        </div>
+    </form>
+
+    <section class="panel management-panel" aria-label="Lista de traduções">
+        <div class="table-wrap">
+            <table class="management-table translation-table">
+                <thead>
+                    <tr>
+                        <th>CHAVE</th>
+                        @foreach (var language in SiteLanguages.All)
+                        {
+                            <th><span class="lang-badge">@language.Code.ToUpperInvariant()</span> @language.Name.ToUpperInvariant()</th>
+                        }
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (Model.Items.Count == 0)
+                {
+                    <tr><td colspan="@(SiteLanguages.All.Count + 2)"><div class="empty-state"><span class="empty-mark" aria-hidden="true">—</span><strong>Nenhuma tradução encontrada</strong><span>Altera a pesquisa ou limpa os filtros.</span></div></td></tr>
+                }
+                else
+                {
+                    foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="translation-key-cell">
+                                <code class="translation-key">@item.Key</code>
+                                <small><span class="category-chip">@item.Category</span>@if (!string.IsNullOrEmpty(item.Description)) { <span>@item.Description</span> }</small>
+                            </td>
+                            @foreach (var language in SiteLanguages.All)
+                            {
+                                var value = item.Values.GetValueOrDefault(language.Code);
+                                <td class="translation-value" lang="@language.Culture">
+                                    @if (string.IsNullOrWhiteSpace(value))
+                                    {
+                                        <span class="missing-badge">Em falta</span>
+                                    }
+                                    else
+                                    {
+                                        <span title="@value">@value</span>
+                                    }
+                                </td>
+                            }
+                            <td><div class="row-actions"><a asp-action="Edit" asp-route-id="@item.Id" asp-route-returnUrl="@returnUrl">Editar</a><a class="is-danger" asp-action="Delete" asp-route-id="@item.Id">Eliminar</a></div></td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="panel-bottom admin-pagination" aria-label="Paginação">
+                <span>Página @Model.Page de @Model.TotalPages</span>
+                <div>
+                    @if (Model.Page > 1)
+                    {
+                        <a class="secondary-button" asp-action="Index" asp-all-route-data="RouteFor(Model.Page - 1)!" rel="prev">← Anterior</a>
+                    }
+                    @if (Model.Page < Model.TotalPages)
+                    {
+                        <a class="secondary-button" asp-action="Index" asp-all-route-data="RouteFor(Model.Page + 1)!" rel="next">Seguinte →</a>
+                    }
+                </div>
+            </nav>
+        }
+    </section>
+</section>

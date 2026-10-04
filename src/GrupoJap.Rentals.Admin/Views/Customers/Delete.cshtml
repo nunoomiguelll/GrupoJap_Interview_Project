@@ -1,0 +1,28 @@
+@model Customer
+@{ ViewData["Title"] = "Eliminar cliente"; int contractCount = ViewBag.ContractCount; }
+
+<section class="management-page">
+    <div class="page-heading management-heading">
+        <div><p class="eyebrow">CLIENTES <span>·</span> ELIMINAR</p><h1>Eliminar cliente</h1></div>
+    </div>
+    <div class="panel confirm-panel">
+        <dl>
+            <dt>Nome</dt><dd>@Model.FullName</dd>
+            <dt>Email</dt><dd>@Model.Email</dd>
+            <dt>Telefone</dt><dd>@Model.Phone</dd>
+        </dl>
+        @if (contractCount > 0)
+        {
+            <div class="notice notice-error" role="alert">Este cliente tem @contractCount contrato(s) associado(s) e não pode ser eliminado.</div>
+            <div class="form-actions"><a class="secondary-button" asp-action="Index">Voltar</a></div>
+        }
+        else
+        {
+            <p>Tens a certeza que queres eliminar este cliente? Esta ação não pode ser revertida.</p>
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="form-actions">
+                <a class="secondary-button" asp-action="Index">Cancelar</a>
+                <button class="danger-button" type="submit">Eliminar</button>
+            </form>
+        }
+    </div>
+</section>

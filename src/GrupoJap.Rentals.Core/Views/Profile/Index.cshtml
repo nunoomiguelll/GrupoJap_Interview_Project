@@ -1,0 +1,63 @@
+@model GrupoJap.Rentals.ViewModels.ProfileViewModel
+@{ ViewData["Title"] = T["nav.my_profile"]; Layout = "_Layout"; }
+
+<section class="management-page form-page">
+    <div class="page-heading management-heading">
+        <div>
+            <p class="eyebrow">@T["profile.eyebrow"]</p>
+            <h1>@T["nav.my_profile"]</h1>
+            <p class="heading-copy">@T["profile.lead"]</p>
+        </div>
+        <a class="secondary-button" asp-action="Password">@T["profile.change_password"]</a>
+    </div>
+
+    <partial name="_Notices" />
+
+    <form asp-action="Index" method="post" enctype="multipart/form-data" class="panel entity-form">
+        <div asp-validation-summary="ModelOnly" class="form-errors" role="alert"></div>
+
+        <div class="profile-photo-row">
+            @if (!string.IsNullOrEmpty(Model.PhotoPath))
+            {
+                <img class="profile-photo" src="@Model.PhotoPath" alt="@T["profile.photo_alt"]" data-photo-preview />
+            }
+            else
+            {
+                <span class="profile-photo profile-photo-initial" data-photo-preview-fallback>@Model.Initial</span>
+            }
+            <div class="field-group">
+                <label asp-for="Photo"></label>
+                <input asp-for="Photo" type="file" accept="image/jpeg,image/png,image/webp" data-photo-input />
+                <small class="field-hint">@T["profile.photo_hint"]</small>
+                <span asp-validation-for="Photo"></span>
+                @if (!string.IsNullOrEmpty(Model.PhotoPath))
+                {
+                    <label class="check-row"><input asp-for="RemovePhoto" type="checkbox" /> @Html.DisplayNameFor(m => m.RemovePhoto)</label>
+                }
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="field-group"><label asp-for="Email"></label><input asp-for="Email" readonly /></div>
+            <div class="field-group"><label>@T["profile.role"]</label><input value="@Model.RoleLabel" readonly /></div>
+            <div class="field-group"><label asp-for="FullName"></label><input asp-for="FullName" autocomplete="name" maxlength="150" /><span asp-validation-for="FullName"></span></div>
+            <div class="field-group"><label asp-for="PhoneNumber"></label><input asp-for="PhoneNumber" type="tel" inputmode="numeric" maxlength="9" placeholder="@T["booking.phone_placeholder"]" /><span asp-validation-for="PhoneNumber"></span></div>
+            <div class="field-group"><label asp-for="JobTitle"></label><input asp-for="JobTitle" maxlength="100" placeholder="@T["profile.job_placeholder"]" /><span asp-validation-for="JobTitle"></span></div>
+            <div class="field-group">
+                <label asp-for="FavoriteBrand"></label>
+                <input asp-for="FavoriteBrand" maxlength="80" list="brand-suggestions" autocomplete="off" placeholder="@T["profile.brand_placeholder"]" />
+                <datalist id="brand-suggestions">
+                    @foreach (var brand in Model.BrandSuggestions)
+                    {
+                        <option value="@brand"></option>
+                    }
+                </datalist>
+                <span asp-validation-for="FavoriteBrand"></span>
+            </div>
+        </div>
+        <div class="field-group"><label asp-for="Bio"></label><textarea asp-for="Bio" rows="4" maxlength="500" placeholder="@T["profile.bio_placeholder"]"></textarea><span asp-validation-for="Bio"></span></div>
+
+        <div class="form-actions"><a class="secondary-button" href="~/">@T["common.cancel"]</a><button class="primary-button" type="submit">@T["profile.save"] <span aria-hidden="true">→</span></button></div>
+    </form>
+</section>
+@section Scripts { <partial name="_FormScripts" /> }

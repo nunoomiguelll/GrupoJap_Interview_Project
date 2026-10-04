@@ -1,0 +1,20 @@
+@model RentalContract
+@{ ViewData["Title"] = "Eliminar contrato"; }
+
+<section class="management-page">
+    <div class="page-heading management-heading">
+        <div><p class="eyebrow">ALUGUERES <span>·</span> ELIMINAR</p><h1>Eliminar contrato</h1></div>
+    </div>
+    <div class="panel confirm-panel">
+        <dl>
+            <dt>Cliente</dt><dd>@Model.Customer?.FullName</dd>
+            <dt>Veículo</dt><dd>@Model.Vehicle?.Brand @Model.Vehicle?.Model (@Model.Vehicle?.Registration)</dd>
+            <dt>Período</dt><dd>@Model.StartDate?.ToString("dd/MM/yyyy") – @Model.EndDate?.ToString("dd/MM/yyyy")</dd>
+        </dl>
+        <p>Tens a certeza que queres eliminar este contrato? Esta ação não pode ser revertida.</p>
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="form-actions">
+            <a class="secondary-button" asp-action="Index">Cancelar</a>
+            <button class="danger-button" type="submit">Eliminar</button>
+        </form>
+    </div>
+</section>

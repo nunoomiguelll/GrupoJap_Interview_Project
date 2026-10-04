@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GrupoJap Rentals | Especificação funcional</title>
+  <style>
+    :root { color-scheme: light; --ink: #202321; --muted: #59615c; --red: #d71920; --yellow: #ffe66d; --line: #d8ddd8; --paper: #fff; --soft: #f4f6f3; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #e9ece8; color: var(--ink); font: 10.5pt/1.5 "Aptos", "Segoe UI", sans-serif; }
+    main { width: 210mm; margin: 12mm auto; padding: 18mm 18mm 16mm; background: var(--paper); box-shadow: 0 3mm 12mm #0002; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 150mm; margin-bottom: 5mm; font-size: 30pt; line-height: 1.08; }
+    h2 { margin: 10mm 0 4mm; padding-bottom: 2mm; border-bottom: 2px solid var(--yellow); font-size: 17pt; }
+    h3 { margin: 6mm 0 2mm; font-size: 12pt; }
+    p { margin-bottom: 3mm; }
+    .cover { min-height: 245mm; display: flex; flex-direction: column; justify-content: center; position: relative; }
+    .eyebrow { margin-bottom: 8mm; color: var(--red); font-size: 10pt; font-weight: 700; text-transform: uppercase; }
+    .highlight { display: inline-block; padding: 2mm 4mm; background: var(--yellow); }
+    .sub { max-width: 145mm; color: var(--muted); font-size: 15pt; }
+    .meta { margin-top: 14mm; color: var(--muted); }
+    .note { margin: 5mm 0; padding: 4mm 5mm; border-left: 3px solid var(--red); background: var(--soft); }
+    table { width: 100%; margin: 3mm 0 5mm; border-collapse: collapse; font-size: 9.5pt; }
+    th, td { padding: 2.5mm 3mm; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { background: var(--soft); }
+    code { padding: .3mm 1mm; background: var(--soft); font: 9pt Consolas, monospace; }
+    ul, ol { margin: 2mm 0 4mm; padding-left: 6mm; }
+    li { margin: 1.2mm 0; }
+    .relationship { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 3mm; margin: 5mm 0; text-align: center; }
+    .entity { padding: 4mm 2mm; border: 1px solid var(--line); background: var(--soft); font-weight: 700; }
+    .arrow { color: var(--red); font-size: 16pt; }
+    .small { color: var(--muted); font-size: 9pt; }
+    .page-break { break-before: page; }
+    .footer { margin-top: 12mm; padding-top: 3mm; border-top: 1px solid var(--line); color: var(--muted); font-size: 8.5pt; }
+    @page { size: A4; margin: 14mm; }
+    @media print {
+      body { background: white; }
+      main { width: auto; margin: 0; padding: 0; box-shadow: none; }
+      .cover { min-height: 265mm; }
+      h2, h3 { break-after: avoid; }
+      table, .note, .relationship { break-inside: avoid; }
+      .footer { position: running(footer); }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <section class="cover">
+    <div class="eyebrow">GrupoJap · Desafio técnico</div>
+    <h1>Gestão de aluguer<br><span class="highlight">de veículos</span></h1>
+    <p class="sub">Especificação funcional, modelo inicial de domínio e plano de implementação.</p>
+    <p class="meta">ASP.NET Core MVC · C# · SQL Server · Entity Framework Core</p>
+    <p class="small">Documento de trabalho · 1 de outubro de 2026</p>
+  </section>
+
+  <section class="page-break">
+    <h2>1. Objetivo e âmbito</h2>
+    <p>A aplicação permite gerir veículos, clientes e contratos de aluguer. Esta especificação traduz o desafio técnico fornecido em requisitos verificáveis e regista as decisões tomadas para iniciar o domínio.</p>
+    <div class="note"><strong>Estado atual:</strong> o projeto ASP.NET Core MVC, as entidades, o <code>ApplicationDbContext</code> e as migrations iniciais estão preparados. A base <code>GrupoJapRentals</code> foi criada na instância local SQL Server Express e as migrations foram aplicadas; os controladores de gestão e formulários ainda serão implementados.</div>
+
+    <h2>2. Stack e organização</h2>
+    <ul>
+      <li>ASP.NET Core MVC em C# para rotas, controllers e views Razor.</li>
+      <li>HTML, CSS e JavaScript para a interface; validação do servidor é sempre a autoridade.</li>
+      <li>SQL Server com Entity Framework Core Code-First.</li>
+      <li>Testes unitários com xUnit para as regras de domínio.</li>
+    </ul>
+    <p>Organização inicial: <code>Models/</code> contém as entidades e enumerações; <code>Controllers/</code> contém os fluxos MVC; <code>Views/</code> contém as páginas Razor; <code>wwwroot/</code> contém CSS e JavaScript. A configuração EF Core e os serviços de negócio serão acrescentados nas fases seguintes.</p>
+
+    <h2>3. Modelo de domínio</h2>
+    <div class="relationship">
+      <div class="entity">Customer<br><span class="small">1 cliente</span></div><div class="arrow">1 → N</div>
+      <div class="entity">RentalContract<br><span class="small">um contrato</span></div><div class="arrow">N ← 1</div>
+      <div class="entity">Vehicle<br><span class="small">1 veículo</span></div>
+    </div>
+    <p>Cada contrato referencia exatamente um cliente e um veículo. Um cliente ou veículo pode estar associado a vários contratos ao longo do tempo. Os identificadores estrangeiros serão obrigatórios e as relações configuradas no <code>DbContext</code>.</p>
+
+    <h3>Vehicle · veículo</h3>
+    <table><thead><tr><th>Campo</th><th>Regra</th></tr></thead><tbody>
+      <tr><td><code>Id</code></td><td>Chave primária gerada pela base de dados.</td></tr>
+      <tr><td><code>Brand</code>, <code>Model</code></td><td>Obrigatórios; máximo de 80 caracteres.</td></tr>
+      <tr><td><code>Registration</code></td><td>Obrigatória; máximo de 15 caracteres; índice único no SQL Server.</td></tr>
+      <tr><td><code>YearOfManufacture</code></td><td>Obrigatório; positivo e não posterior ao ano atual.</td></tr>
+      <tr><td><code>FuelType</code></td><td>Obrigatório; enum: gasolina, gasóleo, híbrido, elétrico, GPL ou outro. O valor por selecionar é rejeitado.</td></tr>
+    </tbody></table>
+
+    <h3>Customer · cliente</h3>
+    <table><thead><tr><th>Campo</th><th>Regra</th></tr></thead><tbody>
+      <tr><td><code>Id</code></td><td>Chave primária gerada pela base de dados.</td></tr>
+      <tr><td><code>FullName</code></td><td>Obrigatório; máximo de 150 caracteres.</td></tr>
+      <tr><td><code>Email</code></td><td>Obrigatório; formato válido; máximo de 254 caracteres; índice único no SQL Server.</td></tr>
+      <tr><td><code>Phone</code></td><td>Obrigatório; por decisão inicial, exatamente 9 dígitos, sem espaços ou símbolos (formato nacional português).</td></tr>
+      <tr><td><code>DrivingLicenseNumber</code></td><td>Obrigatória; máximo de 30 caracteres.</td></tr>
+    </tbody></table>
+  </section>
+
+  <section class="page-break">
+    <h2>4. Contratos e regras de negócio</h2>
+    <h3>RentalContract · contrato de aluguer</h3>
+    <table><thead><tr><th>Campo</th><th>Regra</th></tr></thead><tbody>
+      <tr><td><code>Id</code></td><td>Chave primária gerada pela base de dados.</td></tr>
+      <tr><td><code>CustomerId</code>, <code>VehicleId</code></td><td>Obrigatórios; têm de referenciar registos existentes.</td></tr>
+      <tr><td><code>StartDate</code></td><td>Obrigatória; não pode ser anterior à data atual.</td></tr>
+      <tr><td><code>EndDate</code></td><td>Obrigatória; tem de ser posterior à data de início.</td></tr>
+      <tr><td><code>InitialMileage</code></td><td>Obrigatória; quilometragem inteira igual ou superior a zero.</td></tr>
+    </tbody></table>
+
+    <h3>Prevenção de conflitos</h3>
+    <p>As datas do contrato são datas civis inclusivas, sem horas. Para o mesmo veículo, dois contratos entram em conflito quando <code>inicioExistente &lt;= fimNovo</code> e <code>fimExistente &gt;= inicioNovo</code>. Assim, a data de devolução continua reservada ao contrato atual; o contrato seguinte começa num dia posterior.</p>
+    <p>A entidade contém uma operação para comparar períodos. A consulta de conflitos e a gravação atómica serão responsabilidade do serviço de aluguer, que deve impedir duplicações mesmo quando existam pedidos concorrentes.</p>
+
+    <h3>Estado do veículo</h3>
+    <p>O estado não é armazenado nem editável. Para uma data de consulta <code>hoje</code>, um veículo está alugado se existir um contrato para o qual <code>inicio &lt;= hoje &lt;= fim</code>; caso contrário está disponível. A disponibilidade futura também tem de ser verificada ao criar um contrato.</p>
+
+    <h2>5. Integridade e validação</h2>
+    <ul>
+      <li>Validação no servidor através de Data Annotations e validações entre campos.</li>
+      <li>Índices únicos na base de dados para matrícula e email; a verificação da interface não substitui a restrição persistente.</li>
+      <li>Normalizar espaços e capitalização da matrícula/email antes de comparar e gravar, mantendo a mesma regra em todos os fluxos.</li>
+      <li>Validar sobreposição na camada de serviço e tratar violações de unicidade/conflito com mensagens compreensíveis.</li>
+      <li>Não permitir eliminar clientes ou veículos referenciados por contratos sem uma decisão explícita sobre histórico.</li>
+    </ul>
+    <div class="note"><strong>Nota de fuso horário:</strong> a validação atual usa a data local do servidor. Ao definir o ambiente de execução, fixar o fuso horário de negócio para evitar diferenças junto à meia-noite.</div>
+  </section>
+
+  <section class="page-break">
+    <h2>6. Plano de implementação</h2>
+    <ol>
+      <li><strong>Persistência:</strong> base <code>GrupoJapRentals</code> criada na instância SQL Server Express e migrations aplicadas; documentar a configuração para outros ambientes.</li>
+      <li><strong>Veículos e clientes:</strong> implementar CRUD MVC, formulários, listagens, validações e tratamento de duplicados.</li>
+      <li><strong>Contratos:</strong> implementar seleção de cliente/veículo, datas, quilometragem, conflito de períodos e cálculo de disponibilidade.</li>
+      <li><strong>Interface:</strong> concluir navegação, mensagens de erro/sucesso, apresentação responsiva, acessibilidade e pesquisa nas listagens.</li>
+      <li><strong>Qualidade:</strong> testar regras e fluxos, rever migrations, documentar setup e preparar a demonstração técnica.</li>
+    </ol>
+
+    <h2>7. Critérios de aceitação</h2>
+    <ul>
+      <li>Não se consegue criar veículo sem os campos obrigatórios, com ano futuro ou matrícula duplicada.</li>
+      <li>Não se consegue criar cliente sem os campos obrigatórios, com email inválido/duplicado ou telefone fora do formato acordado.</li>
+      <li>Não se consegue criar contrato sem cliente/veículo, com início passado, fim inválido, quilometragem negativa ou período conflituoso.</li>
+      <li>As listas apresentam o estado calculado do veículo com base nos contratos e na data consultada.</li>
+      <li>As regras essenciais têm testes automatizados e a aplicação funciona com uma base SQL Server configurada.</li>
+    </ul>
+
+    <h2>8. Decisões a confirmar</h2>
+    <ul>
+      <li>Confirmar se o telefone será sempre português (9 dígitos) ou se serão aceites indicativos internacionais.</li>
+      <li>Confirmar se a disponibilidade apresentada deve ser apenas a atual ou também por data futura.</li>
+      <li>Confirmar política de cancelamento/eliminação de contratos e manutenção de histórico.</li>
+      <li>Escolher o servidor SQL Server e o fuso horário usados na demonstração.</li>
+    </ul>
+    <div class="footer">GrupoJap Rentals · Documento baseado no desafio técnico fornecido · 1 de outubro de 2026</div>
+  </section>
+</main>
+</body>
+</html>

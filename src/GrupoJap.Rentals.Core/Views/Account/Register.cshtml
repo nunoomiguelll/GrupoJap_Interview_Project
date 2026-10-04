@@ -1,0 +1,20 @@
+@model GrupoJap.Rentals.ViewModels.RegisterViewModel
+@{ ViewData["Title"] = T["account.create"]; Layout = "_AuthLayout"; }
+
+<section class="panel auth-card">
+    <div>
+        <p class="eyebrow">@T["account.register.eyebrow"]</p>
+        <h1>@T["account.create"]</h1>
+        <p class="heading-copy">@T["account.register.lead"]</p>
+    </div>
+    <form asp-action="Register" method="post" class="auth-form">
+        <div asp-validation-summary="ModelOnly" class="form-errors" role="alert"></div>
+        <div class="field-group"><label asp-for="FullName"></label><input asp-for="FullName" autocomplete="name" maxlength="150" autofocus /><span asp-validation-for="FullName"></span></div>
+        <div class="field-group"><label asp-for="Email"></label><input asp-for="Email" type="email" autocomplete="username" maxlength="254" /><span asp-validation-for="Email"></span></div>
+        <div class="field-group"><label asp-for="Password"></label><input asp-for="Password" autocomplete="new-password" /><span asp-validation-for="Password"></span></div>
+        <div class="field-group"><label asp-for="ConfirmPassword"></label><input asp-for="ConfirmPassword" autocomplete="new-password" /><span asp-validation-for="ConfirmPassword"></span></div>
+        <button class="primary-button" type="submit">@T["account.create"] <span aria-hidden="true">→</span></button>
+    </form>
+    <p class="auth-alt">@T["account.register.has_account"] <a class="text-link" asp-action="Login">@T["nav.login"]</a></p>
+</section>
+@section Scripts { <partial name="_FormScripts" /> }

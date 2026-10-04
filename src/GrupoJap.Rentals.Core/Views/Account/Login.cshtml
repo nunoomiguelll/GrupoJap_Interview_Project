@@ -1,0 +1,25 @@
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@model GrupoJap.Rentals.ViewModels.LoginViewModel
+@{ ViewData["Title"] = T["nav.login"]; Layout = "_AuthLayout"; }
+
+<section class="panel auth-card">
+    <div>
+        <p class="eyebrow">@T["account.login.eyebrow"]</p>
+        <h1>@T["nav.login"]</h1>
+        <p class="heading-copy">@T["account.login.lead"]</p>
+    </div>
+    <form asp-action="Login" method="post" class="auth-form">
+        <div asp-validation-summary="ModelOnly" class="form-errors" role="alert"></div>
+        <input type="hidden" asp-for="ReturnUrl" />
+        <div class="field-group"><label asp-for="Email"></label><input asp-for="Email" type="email" autocomplete="username" autofocus /><span asp-validation-for="Email"></span></div>
+        <div class="field-group"><label asp-for="Password"></label><input asp-for="Password" autocomplete="current-password" /><span asp-validation-for="Password"></span></div>
+        <label class="check-row"><input asp-for="RememberMe" type="checkbox" /> @Html.DisplayNameFor(m => m.RememberMe)</label>
+        <button class="primary-button" type="submit">@T["nav.login"] <span aria-hidden="true">→</span></button>
+    </form>
+    @if (Configuration.GetValue<bool>("Account:AllowRegistration"))
+    {
+        <p class="auth-alt">@T["account.login.no_account"] <a class="text-link" asp-action="Register">@T["account.create"]</a></p>
+    }
+</section>
+@section Scripts { <partial name="_FormScripts" /> }

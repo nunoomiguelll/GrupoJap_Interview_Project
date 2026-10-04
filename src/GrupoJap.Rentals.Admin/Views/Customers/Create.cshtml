@@ -1,0 +1,20 @@
+@model Customer
+@{ ViewData["Title"] = "Registar cliente"; }
+
+<section class="management-page form-page">
+    <div class="page-heading management-heading">
+        <div>
+            <p class="eyebrow">CLIENTES <span>·</span> NOVO REGISTO</p>
+            <h1>Registar cliente</h1>
+            <p class="heading-copy">Preenche os dados de contacto e a carta de condução.</p>
+        </div>
+        <a class="secondary-button" asp-action="Index"><span aria-hidden="true">←</span> Voltar aos clientes</a>
+    </div>
+
+    <form asp-action="Create" method="post" class="panel entity-form">
+        <div asp-validation-summary="ModelOnly" class="form-errors" role="alert"></div>
+        <partial name="_Fields" model="Model" />
+        <div class="form-actions"><a class="secondary-button" asp-action="Index">Cancelar</a><button class="primary-button" type="submit">Guardar cliente <span aria-hidden="true">→</span></button></div>
+    </form>
+</section>
+@section Scripts { <partial name="_FormScripts" /> }

@@ -1,0 +1,20 @@
+@{ ViewData["Title"] = T["account.denied.title"]; Layout = "_AuthLayout"; }
+
+<section class="panel auth-card">
+    <div>
+        <p class="eyebrow">403 <span>·</span> @T["account.denied.title"].Value.ToUpper()</p>
+        <h1>@T["account.denied.heading"]</h1>
+        <p class="heading-copy">@T["account.denied.lead"]</p>
+    </div>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <div class="form-actions">
+            <a class="secondary-button" href="~/">@T["common.back_home"]</a>
+            <form asp-action="Logout" method="post" class="inline-form"><button class="primary-button" type="submit">@T["nav.logout"]</button></form>
+        </div>
+    }
+    else
+    {
+        <a class="primary-button" asp-action="Login">@T["nav.login"]</a>
+    }
+</section>

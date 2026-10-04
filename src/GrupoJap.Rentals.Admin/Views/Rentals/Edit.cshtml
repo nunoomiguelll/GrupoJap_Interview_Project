@@ -1,0 +1,21 @@
+@model RentalContract
+@{ ViewData["Title"] = "Editar contrato"; }
+
+<section class="management-page form-page">
+    <div class="page-heading management-heading">
+        <div>
+            <p class="eyebrow">ALUGUERES <span>·</span> EDIÇÃO</p>
+            <h1>Editar contrato</h1>
+            <p class="heading-copy">Contrato #@Model.Id</p>
+        </div>
+        <a class="secondary-button" asp-action="Index"><span aria-hidden="true">←</span> Voltar aos alugueres</a>
+    </div>
+
+    <form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="panel entity-form">
+        <div asp-validation-summary="ModelOnly" class="form-errors" role="alert"></div>
+        <input type="hidden" asp-for="Id" />
+        <partial name="_Fields" model="Model" />
+        <div class="form-actions"><a class="secondary-button" asp-action="Index">Cancelar</a><button class="primary-button" type="submit">Guardar alterações <span aria-hidden="true">→</span></button></div>
+    </form>
+</section>
+@section Scripts { <partial name="_FormScripts" /> }

@@ -1,0 +1,149 @@
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject IConfiguration Configuration
+@{
+    var currentUser = User.Identity?.IsAuthenticated == true ? await UserManager.GetUserAsync(User) : null;
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    string NavCurrent(string action) => currentController == "Site" && currentAction == action ? "is-current" : string.Empty;
+    var currentLanguage = SiteLanguages.CurrentLanguage;
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+<!DOCTYPE html>
+<html lang="@currentLanguage.Culture" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4f5f0" />
+    <meta name="description" content="@T["layout.meta.description"]" />
+    <title>@ViewData["Title"] · GrupoJap Rent-a-Car</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/_content/GrupoJap.Rentals.Core/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/public.css" asp-append-version="true" />
+</head>
+<body class="public-body">
+    <a class="skip-link" href="#conteudo">@T["layout.skip"]</a>
+
+    <header class="site-header">
+        <div class="site-container site-header-inner">
+            <a class="site-logo" asp-controller="Site" asp-action="Index" aria-label="@T["layout.logo_label"]">
+                <span class="brand-mark" aria-hidden="true"><span></span><span></span></span>
+                <span class="site-logo-copy"><strong>GrupoJap</strong><small>RENT-A-CAR</small></span>
+            </a>
+
+            <nav class="site-nav" id="site-nav" aria-label="@T["nav.label"]">
+                <a class="@NavCurrent("Index")" asp-controller="Site" asp-action="Index">@T["nav.home"]</a>
+                <a class="@NavCurrent("Fleet")" asp-controller="Site" asp-action="Fleet">@T["nav.fleet"]</a>
+                <a href="/#como-funciona">@T["nav.how"]</a>
+                <a href="#contactos">@T["nav.contacts"]</a>
+                @if (currentUser is not null)
+                {
+                    <a class="@NavCurrent("MyBookings")" asp-controller="Site" asp-action="MyBookings">@T["nav.my_bookings"]</a>
+                }
+            </nav>
+
+            <div class="site-actions">
+                <details class="lang-menu">
+                    <summary aria-label="@T["nav.language"]: @currentLanguage.Name" title="@T["nav.language"]">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+                        <span>@currentLanguage.Code.ToUpperInvariant()</span>
+                    </summary>
+                    <ul class="lang-dropdown">
+                        @foreach (var language in SiteLanguages.All)
+                        {
+                            <li>
+                                <a href="@Url.Action("Set", "Language", new { code = language.Code, returnUrl })" lang="@language.Culture" hreflang="@language.Culture" aria-current="@(language == currentLanguage ? "true" : null)">
+                                    <span class="lang-code">@language.Code.ToUpperInvariant()</span> @language.Name
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </details>
+                @if (currentUser is not null)
+                {
+                    <details class="account-menu">
+                        <summary aria-label="@T["nav.account_menu"]">
+                            <span class="account-avatar">@if (!string.IsNullOrEmpty(currentUser.PhotoPath)) { <img src="@currentUser.PhotoPath" alt="" /> } else { @currentUser.Initial }</span>
+                            <span class="account-name">@currentUser.DisplayName</span>
+                        </summary>
+                        <div class="account-dropdown">
+                            <a asp-controller="Site" asp-action="MyBookings">@T["nav.my_bookings"]</a>
+                            <a asp-controller="Profile" asp-action="Index">@T["nav.my_profile"]</a>
+                            @if (User.IsInRole(AppRoles.Admin) && !string.IsNullOrEmpty(Configuration["Urls:Admin"]))
+                            {
+                                <a href="@Configuration["Urls:Admin"]">@T["nav.admin"]</a>
+                            }
+                            <form asp-controller="Account" asp-action="Logout" method="post"><button type="submit">@T["nav.logout"]</button></form>
+                        </div>
+                    </details>
+                }
+                else
+                {
+                    <a class="site-link-button" asp-controller="Account" asp-action="Login">@T["nav.login"]</a>
+                    <a class="neon-button" asp-controller="Account" asp-action="Register">@T["nav.register"]</a>
+                }
+                <button class="icon-button site-menu-toggle" type="button" data-site-menu aria-controls="site-nav" aria-expanded="false" aria-label="@T["nav.open_menu"]">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main id="conteudo" class="site-main" role="main">
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer" id="contactos">
+        <div class="site-container site-footer-grid">
+            <div class="footer-brand">
+                <a class="site-logo" asp-controller="Site" asp-action="Index">
+                    <span class="brand-mark" aria-hidden="true"><span></span><span></span></span>
+                    <span class="site-logo-copy"><strong>GrupoJap</strong><small>RENT-A-CAR</small></span>
+                </a>
+                <p>@T["footer.about"]</p>
+            </div>
+            <div>
+                <h2>@T["footer.explore"]</h2>
+                <ul>
+                    <li><a asp-controller="Site" asp-action="Fleet">@T["common.see_all_vehicles"]</a></li>
+                    <li><a asp-controller="Site" asp-action="Fleet" asp-route-onlyAvailable="true">@T["common.available_today"]</a></li>
+                    <li><a href="/#como-funciona">@T["nav.how"]</a></li>
+                </ul>
+            </div>
+            <div>
+                <h2>@T["footer.account"]</h2>
+                <ul>
+                    @if (currentUser is null)
+                    {
+                        <li><a asp-controller="Account" asp-action="Login">@T["nav.login"]</a></li>
+                        <li><a asp-controller="Account" asp-action="Register">@T["account.create"]</a></li>
+                    }
+                    else
+                    {
+                        <li><a asp-controller="Site" asp-action="MyBookings">@T["nav.my_bookings"]</a></li>
+                        <li><a asp-controller="Profile" asp-action="Index">@T["nav.my_profile"]</a></li>
+                    }
+                </ul>
+            </div>
+            <div>
+                <h2>@T["footer.contacts"]</h2>
+                <ul class="footer-contacts">
+                    <li><span>@T["footer.phone"]</span> @T["footer.phone_value"]</li>
+                    <li><span>@T["footer.email"]</span> @T["footer.email_value"]</li>
+                    <li><span>@T["footer.address"]</span> @T["footer.address_value"]</li>
+                </ul>
+            </div>
+        </div>
+        <div class="site-container footer-bottom">
+            <span>© @DateTime.Today.Year GrupoJap · @T["footer.copyright"]</span>
+            <span>@T["footer.made_with"]</span>
+        </div>
+    </footer>
+
+    <script src="~/_content/GrupoJap.Rentals.Core/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/public.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

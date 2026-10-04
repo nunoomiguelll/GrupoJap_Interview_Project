@@ -1,0 +1,101 @@
+﻿@model GrupoJap.Rentals.ViewModels.DashboardViewModel
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Visão geral";
+    var portugueseCulture = CultureInfo.GetCultureInfo("pt-PT");
+}
+
+<section class="dashboard" id="overview">
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">FROTA <span>·</span> @DateTime.Today.ToString("dd MMMM yyyy", portugueseCulture).ToUpper(portugueseCulture)</p>
+            <h1>Visão geral da frota</h1>
+            <p class="heading-copy">O essencial da operação, num só lugar.</p>
+        </div>
+        <div class="heading-mark" aria-hidden="true"><span>GJ</span><i></i></div>
+    </div>
+
+    <section class="metric-grid" aria-label="Indicadores da frota">
+        <article class="metric-card metric-featured">
+            <div class="metric-topline"><span class="metric-label">Veículos na frota</span><span class="metric-index">01</span></div>
+            <div class="metric-value">@Model.VehicleCount.ToString("00")</div>
+            <div class="metric-foot"><span class="metric-accent"></span><span>Unidades registadas</span></div>
+        </article>
+        <article class="metric-card">
+            <div class="metric-topline"><span class="metric-label">Disponíveis hoje</span><span class="metric-icon metric-icon-green" aria-hidden="true">↗</span></div>
+            <div class="metric-value">@Model.AvailableVehicleCount.ToString("00")</div>
+            <div class="metric-foot"><span class="metric-status status-ready"></span><span>Prontos para alugar</span></div>
+        </article>
+        <article class="metric-card">
+            <div class="metric-topline"><span class="metric-label">Alugueres ativos</span><span class="metric-icon metric-icon-red" aria-hidden="true">↗</span></div>
+            <div class="metric-value">@Model.ActiveRentalCount.ToString("00")</div>
+            <div class="metric-foot"><span class="metric-status status-rented"></span><span>Em curso hoje</span></div>
+        </article>
+        <article class="metric-card">
+            <div class="metric-topline"><span class="metric-label">Clientes</span><span class="metric-icon metric-icon-yellow" aria-hidden="true">↗</span></div>
+            <div class="metric-value">@Model.CustomerCount.ToString("00")</div>
+            <div class="metric-foot"><span class="metric-accent"></span><span>Registados no sistema</span></div>
+        </article>
+    </section>
+
+    <section class="overview-grid" aria-label="Estado da frota e atividade">
+        <article class="panel availability-panel" id="fleet">
+            <div class="panel-heading">
+                <div><p class="panel-kicker">ESTADO ATUAL</p><h2>Disponibilidade</h2></div>
+                <span class="panel-menu" aria-hidden="true">•••</span>
+            </div>
+            <div class="availability-content">
+                <div class="availability-ring" style="--availability: @Model.AvailabilityPercentage" role="img" aria-label="@Model.AvailabilityPercentage% dos veículos disponíveis">
+                    <div class="ring-center"><strong>@Model.AvailabilityPercentage<span>%</span></strong><small>DISPONÍVEL</small></div>
+                </div>
+                <div class="availability-summary">
+                    <p><span class="legend-dot legend-available"></span><span>Disponíveis</span><strong>@Model.AvailableVehicleCount.ToString("00")</strong></p>
+                    <p><span class="legend-dot legend-rented"></span><span>Alugados</span><strong>@((Model.VehicleCount - Model.AvailableVehicleCount).ToString("00"))</strong></p>
+                    <div class="summary-divider"></div>
+                    <p class="summary-total"><span>Total da frota</span><strong>@Model.VehicleCount.ToString("00")</strong></p>
+                </div>
+            </div>
+            <div class="panel-caption"><span class="caption-line"></span>Estado calculado com base nos contratos de hoje</div>
+        </article>
+
+        <article class="panel activity-panel" id="rentals">
+            <div class="panel-heading activity-heading">
+                <div><p class="panel-kicker">MOVIMENTO</p><h2>Contratos recentes</h2></div>
+                <label class="table-search">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
+                    <span class="visually-hidden">Pesquisar contratos</span>
+                    <input type="search" data-rental-search placeholder="Pesquisar" autocomplete="off" />
+                </label>
+            </div>
+            <div class="table-wrap">
+                <table class="rental-table">
+                    <thead><tr><th>CLIENTE / VEÍCULO</th><th>PERÍODO</th><th>ESTADO</th></tr></thead>
+                    <tbody data-rental-rows>
+                    @if (Model.RecentRentals.Count == 0)
+                    {
+                        <tr class="empty-row"><td colspan="3"><div class="empty-state"><span class="empty-mark" aria-hidden="true">—</span><strong>Sem contratos registados</strong><span>Os novos alugueres vão aparecer aqui.</span></div></td></tr>
+                    }
+                    else
+                    {
+                        foreach (var rental in Model.RecentRentals)
+                        {
+                            var statusLabel = rental.IsActive ? "Em curso" : rental.IsUpcoming ? "Agendado" : "Concluído";
+                            var statusClass = rental.IsActive ? "is-active" : rental.IsUpcoming ? "is-upcoming" : "is-complete";
+                            <tr data-rental-row>
+                                <td><div class="customer-cell"><span class="customer-initials">@rental.CustomerName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()?.Substring(0, 1)</span><span><strong>@rental.CustomerName</strong><small>@rental.VehicleName <i>·</i> @rental.Registration</small></span></div></td>
+                                <td><span class="date-range">@rental.StartDate.ToString("dd MMM", portugueseCulture) <i>→</i> @rental.EndDate.ToString("dd MMM yyyy", portugueseCulture)</span></td>
+                                <td><span class="rental-status @statusClass"><i></i>@statusLabel</span></td>
+                            </tr>
+                        }
+                        <tr class="no-search-results" data-no-results hidden><td colspan="3">Nenhum contrato corresponde à pesquisa.</td></tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+            <div class="panel-bottom"><span>A mostrar <strong>@Model.RecentRentals.Count</strong> de <strong>@Model.RecentRentals.Count</strong> contratos</span><span class="table-period">ATIVIDADE RECENTE</span></div>
+        </article>
+    </section>
+
+    <footer class="dashboard-footer"><span>GRUPOJAP RENTALS</span><span>GESTÃO DE FROTA <i>·</i> @DateTime.Today.Year</span></footer>
+</section>

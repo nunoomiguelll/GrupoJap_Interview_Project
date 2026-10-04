@@ -1,0 +1,141 @@
+@model GrupoJap.Rentals.ViewModels.FleetViewModel
+@using GrupoJap.Rentals.ViewModels
+@using System.Text.Encodings.Web
+@{
+    ViewData["Title"] = T["nav.fleet"];
+    var today = DateTime.Today.ToString("yyyy-MM-dd");
+    ViewData["PeriodQuery"] = Model.HasPeriod
+        ? $"?start={Model.Start:yyyy-MM-dd}&end={Model.End:yyyy-MM-dd}"
+        : null;
+
+    Dictionary<string, string?> RouteFor(int page) => new()
+    {
+        ["q"] = Model.Q,
+        ["brand"] = Model.Brand,
+        ["fuel"] = Model.Fuel?.ToString(),
+        ["start"] = Model.Start?.ToString("yyyy-MM-dd"),
+        ["end"] = Model.End?.ToString("yyyy-MM-dd"),
+        ["onlyAvailable"] = Model.OnlyAvailable ? "true" : null,
+        ["sort"] = Model.Sort == FleetSort.Brand ? null : Model.Sort.ToString(),
+        ["page"] = page == 1 ? null : page.ToString()
+    };
+}
+
+<section class="page-hero">
+    <div class="site-container">
+        <p class="section-kicker">@T["fleet.kicker"]</p>
+        <h1>@T["fleet.heading"]</h1>
+        <p>
+            @T["fleet.count", Model.TotalCount]
+            @if (Model.HasPeriod)
+            {
+                <span> · @Html.Raw(string.Format(HtmlEncoder.Default.Encode(T["fleet.period"]), $"<strong>{Model.Start:dd/MM/yyyy}</strong>", $"<strong>{Model.End:dd/MM/yyyy}</strong>"))</span>
+            }
+            else
+            {
+                <span> · @T["fleet.today"]</span>
+            }
+        </p>
+    </div>
+</section>
+
+<div class="site-container fleet-layout">
+    <aside class="fleet-filters" aria-label="@T["fleet.filters"]">
+        <form method="get" asp-action="Fleet" data-date-range data-auto-submit>
+            <div class="filter-head">
+                <h2>@T["fleet.filter"]</h2>
+                <a class="text-link" asp-action="Fleet">@T["fleet.clear"]</a>
+            </div>
+
+            <label class="filter-field"><span>@T["fleet.search"]</span><input type="search" name="q" value="@Model.Q" placeholder="@T["fleet.search_placeholder"]" /></label>
+
+            <label class="filter-field"><span>@T["common.brand"]</span>
+                <select name="brand">
+                    <option value="">@T["common.all_fem"]</option>
+                    @foreach (var brand in Model.BrandOptions)
+                    {
+                        <option value="@brand" selected="@(brand == Model.Brand)">@brand</option>
+                    }
+                </select>
+            </label>
+
+            <label class="filter-field"><span>@T["common.fuel"]</span>
+                <select name="fuel">
+                    <option value="">@T["common.all_masc"]</option>
+                    @foreach (var fuel in Enum.GetValues<FuelType>().Where(f => f != FuelType.Unspecified))
+                    {
+                        <option value="@fuel" selected="@(fuel == Model.Fuel)">@T.Fuel(fuel)</option>
+                    }
+                </select>
+            </label>
+
+            <fieldset class="filter-period">
+                <legend>@T["fleet.period_legend"]</legend>
+                <label class="filter-field"><span>@T["common.pickup"]</span><input type="date" name="start" min="@today" value="@Model.Start?.ToString("yyyy-MM-dd")" data-range-start /></label>
+                <label class="filter-field"><span>@T["common.return"]</span><input type="date" name="end" min="@today" value="@Model.End?.ToString("yyyy-MM-dd")" data-range-end /></label>
+                @if (Model.PeriodError is not null)
+                {
+                    <p class="filter-error" role="alert">@Model.PeriodError</p>
+                }
+            </fieldset>
+
+            <label class="filter-check"><input type="checkbox" name="onlyAvailable" value="true" checked="@Model.OnlyAvailable" /> @T["fleet.only_available"]</label>
+
+            <label class="filter-field"><span>@T["fleet.sort"]</span>
+                <select name="sort">
+                    @foreach (var sort in Enum.GetValues<FleetSort>())
+                    {
+                        <option value="@sort" selected="@(sort == Model.Sort)">@T["fleet.sort." + sort]</option>
+                    }
+                </select>
+            </label>
+
+            <button class="neon-button" type="submit">@T["fleet.apply"]</button>
+        </form>
+    </aside>
+
+    <section class="fleet-results" aria-label="@T["fleet.results"]">
+        @if (Model.Vehicles.Count == 0)
+        {
+            <div class="site-empty">
+                <strong>@T["fleet.empty_title"]</strong>
+                <span>@T["fleet.empty_text"]</span>
+                <a class="neon-button" asp-action="Fleet">@T["common.see_all_vehicles"]</a>
+            </div>
+        }
+        else
+        {
+            <div class="vehicle-grid">
+                @foreach (var vehicle in Model.Vehicles)
+                {
+                    <partial name="_VehicleCard" model="vehicle" view-data="ViewData" />
+                }
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="pagination" aria-label="@T["fleet.pagination"]">
+                    @if (Model.Page > 1)
+                    {
+                        <a asp-action="Fleet" asp-all-route-data="RouteFor(Model.Page - 1)!" rel="prev">@T["fleet.prev"]</a>
+                    }
+                    @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                    {
+                        if (pageNumber == Model.Page)
+                        {
+                            <span class="is-current" aria-current="page">@pageNumber</span>
+                        }
+                        else
+                        {
+                            <a asp-action="Fleet" asp-all-route-data="RouteFor(pageNumber)!">@pageNumber</a>
+                        }
+                    }
+                    @if (Model.Page < Model.TotalPages)
+                    {
+                        <a asp-action="Fleet" asp-all-route-data="RouteFor(Model.Page + 1)!" rel="next">@T["fleet.next"]</a>
+                    }
+                </nav>
+            }
+        }
+    </section>
+</div>

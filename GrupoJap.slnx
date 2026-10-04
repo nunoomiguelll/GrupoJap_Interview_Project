@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GrupoJap.Rentals.Admin/GrupoJap.Rentals.Admin.csproj" />
+    <Project Path="src/GrupoJap.Rentals.Core/GrupoJap.Rentals.Core.csproj" />
+    <Project Path="src/GrupoJap.Rentals.Web/GrupoJap.Rentals.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/GrupoJap.Rentals.Tests/GrupoJap.Rentals.Tests.csproj" />
+  </Folder>
+</Solution>

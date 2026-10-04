@@ -1,0 +1,50 @@
+@model IReadOnlyList<GrupoJap.Rentals.ViewModels.RentalListItemViewModel>
+@using GrupoJap.Rentals.Services
+@{ ViewData["Title"] = "Alugueres"; }
+
+<section class="management-page">
+    <div class="page-heading management-heading">
+        <div>
+            <p class="eyebrow">OPERAÇÃO <span>·</span> ALUGUERES</p>
+            <h1>Contratos de aluguer</h1>
+            <p class="heading-copy">@Model.Count contrato(s) registado(s)</p>
+        </div>
+        <a class="primary-button" asp-action="Create"><span aria-hidden="true">＋</span> Novo contrato</a>
+    </div>
+
+    <partial name="_Notices" />
+
+    <section class="panel management-panel" aria-label="Lista de contratos">
+        <div class="table-wrap">
+            <table class="management-table">
+                <thead><tr><th>CLIENTE</th><th>VEÍCULO</th><th>PERÍODO</th><th>KM INICIAL</th><th>ESTADO</th><th></th></tr></thead>
+                <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr><td colspan="6"><div class="empty-state"><span class="empty-mark" aria-hidden="true">—</span><strong>Ainda não há contratos</strong><span>Cria o primeiro contrato associando um cliente a um veículo.</span><a class="text-link" asp-action="Create">Novo contrato <span aria-hidden="true">→</span></a></div></td></tr>
+                }
+                else
+                {
+                    foreach (var rental in Model)
+                    {
+                        var (css, label) = rental.Status switch
+                        {
+                            RentalStatus.Active => ("is-active", "Em curso"),
+                            RentalStatus.Upcoming => ("is-upcoming", "Agendado"),
+                            _ => ("is-complete", "Concluído")
+                        };
+                        <tr>
+                            <td><strong>@rental.CustomerName</strong></td>
+                            <td><div class="entity-cell"><span><strong>@rental.VehicleName</strong><small>@rental.Registration</small></span></div></td>
+                            <td><span class="date-range">@rental.StartDate.ToString("dd/MM/yyyy")<i>→</i>@rental.EndDate.ToString("dd/MM/yyyy")</span></td>
+                            <td>@rental.InitialMileage.ToString("N0")</td>
+                            <td><span class="rental-status @css"><i></i>@label</span></td>
+                            <td><div class="row-actions"><a asp-action="Edit" asp-route-id="@rental.Id">Editar</a><a class="is-danger" asp-action="Delete" asp-route-id="@rental.Id">Eliminar</a></div></td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>
