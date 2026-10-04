@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GrupoJap.Rentals.Core\GrupoJap.Rentals.Core.csproj" />
+    <ProjectReference Include="..\..\src\GrupoJap.Rentals.Admin\GrupoJap.Rentals.Admin.csproj" />
   </ItemGroup>
 
 </Project>
