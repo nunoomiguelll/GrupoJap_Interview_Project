@@ -45,7 +45,7 @@ function applyTheme(theme) {
 	document.documentElement.dataset.theme = theme;
 	themeToggle?.setAttribute("aria-pressed", String(theme === "dark"));
 	themeToggle?.setAttribute("aria-label", (theme === "dark" ? themeToggle.dataset.labelLight : themeToggle.dataset.labelDark) || "");
-	document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#111613" : "#f4f5f0");
+	document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#151011" : "#f6f3f1");
 }
 
 applyTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");

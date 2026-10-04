@@ -55,6 +55,8 @@ public static class TranslationCatalog
         new("nav.label", Layout, null, "Navegação principal", "Main navigation", "Navegación principal"),
         new("nav.operation", Layout, "Título da secção do menu", "OPERAÇÃO", "OPERATIONS", "OPERACIÓN"),
         new("nav.system", Layout, "Título da secção do menu", "SISTEMA", "SYSTEM", "SISTEMA"),
+        new("nav.site", Layout, "Botão desativado na barra lateral", "Aceder ao site", "Go to website", "Ir al sitio web"),
+        new("nav.site_status", Layout, "Texto do botão desativado", "Em desenvolvimento", "In development", "En desarrollo"),
         new("nav.dashboard", Layout, "Menu", "Painel", "Dashboard", "Panel"),
         new("nav.vehicles", Layout, "Menu e título da página", "Veículos", "Vehicles", "Vehículos"),
         new("nav.customers", Layout, "Menu e título da página", "Clientes", "Customers", "Clientes"),

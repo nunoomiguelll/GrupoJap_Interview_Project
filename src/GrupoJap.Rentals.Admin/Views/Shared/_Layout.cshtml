@@ -12,7 +12,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f4f5f0" />
+    <meta name="theme-color" content="#f6f3f1" />
     <script>
         (function () {
             var theme = null;
@@ -37,6 +37,11 @@
                 <span class="brand-mark" aria-hidden="true"><span></span><span></span></span>
                 <span class="brand-copy"><strong>GrupoJap</strong><small>FLEET OPERATIONS</small></span>
             </a>
+
+            <span class="site-button is-disabled" aria-disabled="true" role="link" title="@T["nav.site_status"]">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+                <span><strong>@T["nav.site"]</strong><small>@T["nav.site_status"]</small></span>
+            </span>
 
             @if (User.IsInRole("Admin"))
             {
