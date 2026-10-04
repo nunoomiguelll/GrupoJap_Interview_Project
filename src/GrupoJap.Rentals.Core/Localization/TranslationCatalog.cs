@@ -288,7 +288,7 @@ public static class TranslationCatalog
         new("field.remember", Fields, null, "Manter sessão iniciada", "Keep me signed in", "Mantener la sesión iniciada"),
         new("field.full_name", Fields, null, "Nome completo", "Full name", "Nombre completo"),
         new("field.phone", Fields, null, "Telefone", "Phone", "Teléfono"),
-        new("field.phone_placeholder", Fields, null, "9 dígitos", "9 digits", "9 dígitos"),
+        new("field.phone_example", Fields, "Placeholder do telefone", "Ex.: 912345678", "e.g. 912345678", "Ej.: 912345678"),
         new("field.job_title", Fields, null, "Cargo", "Job title", "Cargo"),
         new("field.favorite_brand", Fields, null, "Marca favorita", "Favourite brand", "Marca favorita"),
         new("field.bio", Fields, null, "Sobre mim", "About me", "Sobre mí"),
@@ -324,7 +324,7 @@ public static class TranslationCatalog
         new("validation.new_password_required", Validation, null, "Indica a nova palavra-passe.", "Enter a new password.", "Indica la nueva contraseña."),
         new("validation.confirm_new_password", Validation, null, "Confirma a nova palavra-passe.", "Confirm the new password.", "Confirma la nueva contraseña."),
         new("validation.phone_required", Validation, null, "O telefone é obrigatório.", "The phone number is required.", "El teléfono es obligatorio."),
-        new("validation.phone_format", Validation, null, "O telefone deve conter 9 dígitos numéricos.", "The phone number must contain 9 digits.", "El teléfono debe contener 9 dígitos."),
+        new("validation.phone_pt", Validation, null, "O telefone deve ter 9 dígitos e começar por 9.", "The phone number must have 9 digits and start with 9.", "El teléfono debe tener 9 dígitos y empezar por 9."),
         new("validation.bio_length", Validation, null, "A bio não pode ter mais de 500 caracteres.", "The bio can't exceed 500 characters.", "La biografía no puede superar los 500 caracteres."),
         new("validation.license_required", Validation, null, "A carta de condução é obrigatória.", "The driving licence number is required.", "El permiso de conducir es obligatorio."),
         new("validation.brand_required", Validation, null, "A marca é obrigatória.", "The brand is required.", "La marca es obligatoria."),
@@ -381,7 +381,8 @@ public static class TranslationCatalog
         "nav.home", "nav.fleet", "nav.how", "nav.contacts", "nav.my_bookings", "nav.admin", "nav.register", "nav.account_menu", "nav.open_menu",
         "account.create", "account.login.no_account", "account.register.eyebrow", "account.register.lead", "account.register.has_account",
         "account.error.duplicate",
-        "field.confirm_password", "validation.confirm_password"
+        "field.confirm_password", "validation.confirm_password",
+        "field.phone_placeholder", "validation.phone_format"
     ];
 
     public static bool IsRetired(string key)

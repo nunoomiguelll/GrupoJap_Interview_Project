@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using GrupoJap.Rentals.Models;
 
 namespace GrupoJap.Rentals.ViewModels;
 
@@ -18,7 +19,7 @@ public sealed class ProfileViewModel
     [Display(Name = "field.full_name")]
     public string FullName { get; set; } = string.Empty;
 
-    [RegularExpression("^[0-9]{9}$", ErrorMessage = "validation.phone_format")]
+    [RegularExpression(PhoneNumbers.PortuguesePattern, ErrorMessage = "validation.phone_pt")]
     [Display(Name = "field.phone")]
     public string? PhoneNumber { get; set; }
 

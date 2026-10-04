@@ -61,6 +61,7 @@ public sealed class CustomersControllerTests : IDisposable
     [Theory]
     [InlineData("91234567")]
     [InlineData("91234567a")]
+    [InlineData("212345678")]
     [InlineData("+351912345678")]
     public async Task Create_PhoneOutsideAgreedFormat_IsRejected(string phone)
     {

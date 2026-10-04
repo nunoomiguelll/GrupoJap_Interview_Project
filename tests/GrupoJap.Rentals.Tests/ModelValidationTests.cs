@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using GrupoJap.Rentals.Models;
+using GrupoJap.Rentals.ViewModels;
 
 namespace GrupoJap.Rentals.Tests;
 
@@ -56,14 +57,31 @@ public class ModelValidationTests
 
     [Theory]
     [InlineData("912345678", true)]
+    [InlineData("961234567", true)]
+    [InlineData("930000000", true)]
+    [InlineData("212345678", false)]  // 9 dígitos mas não começa por 9
+    [InlineData("812345678", false)]
+    [InlineData("012345678", false)]
     [InlineData("91234567", false)]
     [InlineData("9123456789", false)]
     [InlineData("91234abcd", false)]
+    [InlineData("912 345 678", false)]
     [InlineData("+35191234567", false)]
-    public void Customer_Phone_MustBeNineDigits(string phone, bool valid)
+    public void Customer_Phone_MustBePortuguese_NineDigitsStartingWith9(string phone, bool valid)
     {
         var customer = new Customer { FullName = "Ana Silva", Email = "ana@example.com", Phone = phone, DrivingLicenseNumber = "L-123" };
         Assert.Equal(valid, !Validate(customer).Any(r => r.MemberNames.Contains(nameof(Customer.Phone))));
+    }
+
+    [Theory]
+    [InlineData(null, true)]          // no perfil o telefone é opcional
+    [InlineData("912345678", true)]
+    [InlineData("212345678", false)]
+    [InlineData("91234567", false)]
+    public void Profile_Phone_FollowsTheSameRule(string? phone, bool valid)
+    {
+        var profile = new ProfileViewModel { FullName = "Ana Silva", PhoneNumber = phone };
+        Assert.Equal(valid, !Validate(profile).Any(r => r.MemberNames.Contains(nameof(ProfileViewModel.PhoneNumber))));
     }
 
     [Fact]

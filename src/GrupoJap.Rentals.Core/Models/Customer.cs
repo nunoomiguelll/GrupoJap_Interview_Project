@@ -20,7 +20,7 @@ public sealed class Customer
     public string Email { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "validation.phone_required")]
-    [RegularExpression("^[0-9]{9}$", ErrorMessage = "validation.phone_format")]
+    [RegularExpression(PhoneNumbers.PortuguesePattern, ErrorMessage = "validation.phone_pt")]
     [StringLength(9)]
     [Display(Name = "field.phone")]
     public string Phone { get; set; } = string.Empty;

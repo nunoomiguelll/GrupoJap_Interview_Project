@@ -88,14 +88,14 @@ Nao colocar credenciais reais em ficheiros versionados. Para ambientes partilhad
 
 ## Decisoes a confirmar durante a implementacao
 
-- Formato de telefone aceite e se a aplicacao assume exclusivamente numeros portugueses.
+- ~~Formato de telefone aceite~~ **Decidido:** numeros portugueses com 9 digitos a comecar por 9 (`PhoneNumbers.PortuguesePattern`), para clientes e perfil.
 - Se a disponibilidade deve considerar apenas alugueres ativos hoje ou tambem reservas futuras. O plano considera o estado atual para a listagem e bloqueia sobreposicoes futuras ao criar contratos.
 - A infraestrutura SQL Server disponivel para desenvolvimento e apresentacao.
 - Integracoes reutilizaveis que serao fornecidas posteriormente.
 ## Estado de implementacao (atualizado)
 
 - **Feito:** CRUD completo de Veiculos, Clientes e Contratos (listar, criar, editar, eliminar com confirmacao); validacoes de servidor e cliente; unicidade de matricula e email (tambem tratada na persistencia); bloqueio de contratos sobrepostos por veiculo; estado Disponivel/Alugado calculado a partir dos contratos; eliminacao bloqueada quando existem contratos associados; navegacao ativa no layout.
-- **Regras puras:** `src/GrupoJap.Rentals.Core/Services/RentalRules.cs` (sobreposicao, contrato ativo, estado) com testes xUnit em `tests/GrupoJap.Rentals.Tests` (`dotnet test tests/GrupoJap.Rentals.Tests`).
+- **Regras puras:** `src/GrupoJap.Rentals.Core/Services/RentalRules.cs` (sobreposicao, contrato ativo, estado). Ver a seccao **Testes automatizados**.
 - **Por fazer:** pesquisa/filtros nas listagens, paginacao, seed de dados de demonstracao, testes de integracao dos controladores, protecao contra concorrencia na criacao de contratos (hoje a verificacao de sobreposicao e feita na aplicacao, nao por restricao na BD), integracoes externas (Postmark, Stripe) adiadas.
 - **Nota Git:** `bin/` e `obj/` ja estavam versionados; o `.gitignore` novo nao os remove do indice. Para parar de os versionar: `git rm -r --cached bin obj`.
 
@@ -125,3 +125,27 @@ Nao colocar credenciais reais em ficheiros versionados. Para ambientes partilhad
 - Os valores iniciais estao em `src/GrupoJap.Rentals.Core/Localization/TranslationCatalog.cs`. Ao arrancar, as chaves em falta sao inseridas na base de dados sem alterar o que ja foi editado, e as chaves do antigo site publico (`TranslationCatalog.RetiredPrefixes`/`RetiredKeys`) sao removidas. Eliminar uma traducao do catalogo equivale a repor o texto original.
 - Ordem de recurso de cada texto: BD (idioma atual) -> catalogo (idioma atual) -> BD (portugues) -> catalogo (portugues) -> chave.
 - Nas vistas: `@T["chave"]` ou `@T["chave", argumento]`; nos modelos usa-se a chave em `ErrorMessage`/`Display(Name)` (e `validationContext.Text("chave")` nas validacoes `IValidatableObject`). Para um texto novo: criar a entrada no catalogo e usar a chave.
+
+## Testes automatizados
+
+xUnit, em `tests/GrupoJap.Rentals.Tests` (o enunciado aceita xUnit ou NUnit). Nao precisam de SQL Server: usam uma base EF Core em memoria, nova em cada teste.
+
+```powershell
+dotnet test                                                   # todos
+dotnet test --filter "FullyQualifiedName~RentalsControllerTests"   # uma classe
+dotnet test --logger "console;verbosity=normal"               # lista cada teste
+```
+
+Com o Admin a correr, a DLL fica bloqueada e o build falha: parar a app ou usar `dotnet test --artifacts-path .\.artifacts`.
+
+| Pasta / ficheiro | O que garante |
+|---|---|
+| `RentalRulesTests`, `RentalAvailabilityServiceTests` | Sobreposicao com datas inclusivas, contrato ativo, estado (agendado / em curso / concluido) |
+| `ModelValidationTests` | Campos obrigatorios, ano nao futuro, combustivel, telefone PT (9 digitos, comeca por 9), email, datas e quilometragem do contrato |
+| `Controllers/VehiclesControllerTests` | Matricula duplicada (criar/editar), normalizacao, eliminacao bloqueada com contratos, estado Alugado/Disponivel na lista |
+| `Controllers/CustomersControllerTests` | Email duplicado (sem distinguir maiusculas), email/telefone invalidos, eliminacao bloqueada, contratos e aluguer ativo na lista |
+| `Controllers/RentalsControllerTests` | Conflito de periodos nas fronteiras, cliente/veiculo inexistente, inicio passado, fim invalido, km negativos, edicao sem conflito consigo propria, contrato ja iniciado |
+| `Controllers/HomeControllerTests` | Indicadores do painel e contratos recentes |
+| `Localization/*` | Ordem de recurso das traducoes, cache, catalogo completo (3 idiomas, `{0}` coerentes, todas as chaves usadas no codigo existem), seeder (nao apaga edicoes, remove chaves do site antigo), seletor de idioma (cookie, sem open redirect), mensagens de validacao traduzidas |
+
+Os testes dos controllers usam `Controllers/ControllerTestContext.cs`, que monta o controller como num pedido real (BD em memoria, traducoes, TempData) e corre a mesma validacao que o MVC faz antes da action.
