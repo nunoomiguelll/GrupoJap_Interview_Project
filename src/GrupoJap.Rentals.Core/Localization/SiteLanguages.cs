@@ -4,7 +4,7 @@ namespace GrupoJap.Rentals.Localization;
 
 public sealed record SiteLanguage(string Code, string Culture, string Name);
 
-/// <summary>Idiomas suportados pelo site. O português é o idioma base e o de recurso.</summary>
+/// <summary>Idiomas suportados pelo painel. O português é o idioma base e o de recurso.</summary>
 public static class SiteLanguages
 {
     public const string Default = "pt";
@@ -15,6 +15,8 @@ public static class SiteLanguages
         new("en", "en-GB", "English"),
         new("es", "es-ES", "Español")
     ];
+
+    public static SiteLanguage DefaultLanguage => All.First(language => language.Code == Default);
 
     public static bool IsSupported(string? code) => All.Any(language => language.Code == code);
 

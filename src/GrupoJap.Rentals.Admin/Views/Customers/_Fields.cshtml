@@ -2,6 +2,6 @@
 <div class="form-grid">
     <div class="field-group"><label asp-for="FullName"></label><input asp-for="FullName" autocomplete="name" maxlength="150" /><span asp-validation-for="FullName"></span></div>
     <div class="field-group"><label asp-for="Email"></label><input asp-for="Email" type="email" autocomplete="email" maxlength="254" /><span asp-validation-for="Email"></span></div>
-    <div class="field-group"><label asp-for="Phone"></label><input asp-for="Phone" type="tel" inputmode="numeric" maxlength="9" autocomplete="tel-national" placeholder="9 dígitos" /><span asp-validation-for="Phone"></span></div>
+    <div class="field-group"><label asp-for="Phone"></label><input asp-for="Phone" type="tel" inputmode="numeric" maxlength="9" autocomplete="tel-national" placeholder="@T["field.phone_placeholder"]" /><span asp-validation-for="Phone"></span></div>
     <div class="field-group"><label asp-for="DrivingLicenseNumber"></label><input asp-for="DrivingLicenseNumber" maxlength="30" autocomplete="off" /><span asp-validation-for="DrivingLicenseNumber"></span></div>
 </div>

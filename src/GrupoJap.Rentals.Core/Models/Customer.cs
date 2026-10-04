@@ -8,26 +8,26 @@ public sealed class Customer
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "O nome completo é obrigatório.")]
+    [Required(ErrorMessage = "validation.full_name_required")]
     [StringLength(150)]
-    [Display(Name = "Nome completo")]
+    [Display(Name = "field.full_name")]
     public string FullName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "O email é obrigatório.")]
-    [EmailAddress(ErrorMessage = "Indica um endereço de email válido.")]
+    [Required(ErrorMessage = "validation.email_required")]
+    [EmailAddress(ErrorMessage = "account.error.invalid_email")]
     [StringLength(254)]
-    [Display(Name = "Email")]
+    [Display(Name = "field.email")]
     public string Email { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "O telefone é obrigatório.")]
-    [RegularExpression("^[0-9]{9}$", ErrorMessage = "O telefone deve conter 9 dígitos numéricos.")]
+    [Required(ErrorMessage = "validation.phone_required")]
+    [RegularExpression("^[0-9]{9}$", ErrorMessage = "validation.phone_format")]
     [StringLength(9)]
-    [Display(Name = "Telefone")]
+    [Display(Name = "field.phone")]
     public string Phone { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "A carta de condução é obrigatória.")]
+    [Required(ErrorMessage = "validation.license_required")]
     [StringLength(30)]
-    [Display(Name = "Carta de condução")]
+    [Display(Name = "field.driving_license")]
     public string DrivingLicenseNumber { get; set; } = string.Empty;
 
     public ICollection<RentalContract> RentalContracts { get; set; } = new List<RentalContract>();

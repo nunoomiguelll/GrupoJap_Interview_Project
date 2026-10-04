@@ -1,29 +1,29 @@
 @model IReadOnlyList<GrupoJap.Rentals.ViewModels.VehicleListItemViewModel>
 
 @{
-    ViewData["Title"] = "Veículos";
+    ViewData["Title"] = T["nav.vehicles"].Value;
 }
 
 <section class="management-page">
     <div class="page-heading management-heading">
         <div>
-            <p class="eyebrow">OPERAÇÃO <span>·</span> FROTA</p>
-            <h1>Veículos</h1>
-            <p class="heading-copy">@Model.Count veículo(s) registado(s)</p>
+            <partial name="_Eyebrow" model="@T["vehicles.eyebrow"].Value" />
+            <h1>@T["nav.vehicles"]</h1>
+            <p class="heading-copy">@T["vehicles.count", Model.Count]</p>
         </div>
-        <a class="primary-button" asp-controller="Vehicles" asp-action="Create"><span aria-hidden="true">＋</span> Registar veículo</a>
+        <a class="primary-button" asp-controller="Vehicles" asp-action="Create"><span aria-hidden="true">＋</span> @T["vehicles.add"]</a>
     </div>
 
     <partial name="_Notices" />
 
-    <section class="panel management-panel" aria-label="Lista de veículos">
+    <section class="panel management-panel" aria-label="@T["vehicles.list_label"]">
         <div class="table-wrap">
             <table class="management-table">
-                <thead><tr><th>VEÍCULO</th><th>MATRÍCULA</th><th>ANO</th><th>COMBUSTÍVEL</th><th>ESTADO</th><th></th></tr></thead>
+                <thead><tr><th>@T["vehicles.th_vehicle"]</th><th>@T["vehicles.th_registration"]</th><th>@T["vehicles.th_year"]</th><th>@T["vehicles.th_fuel"]</th><th>@T["common.th_status"]</th><th></th></tr></thead>
                 <tbody>
                 @if (Model.Count == 0)
                 {
-                    <tr><td colspan="6"><div class="empty-state"><span class="empty-mark" aria-hidden="true">—</span><strong>A frota ainda não tem veículos</strong><span>Regista o primeiro veículo para começares a gerir disponibilidade e alugueres.</span><a class="text-link" asp-action="Create">Registar veículo <span aria-hidden="true">→</span></a></div></td></tr>
+                    <tr><td colspan="6"><div class="empty-state"><span class="empty-mark" aria-hidden="true">—</span><strong>@T["vehicles.empty_title"]</strong><span>@T["vehicles.empty_text"]</span><a class="text-link" asp-action="Create">@T["vehicles.add"] <span aria-hidden="true">→</span></a></div></td></tr>
                 }
                 else
                 {
@@ -33,9 +33,9 @@
                             <td><div class="entity-cell"><span class="entity-symbol" aria-hidden="true">@vehicle.Brand.Substring(0, 1)</span><span><strong>@vehicle.Brand @vehicle.Model</strong></span></div></td>
                             <td><span class="plate-number">@vehicle.Registration</span></td>
                             <td>@vehicle.YearOfManufacture</td>
-                            <td>@vehicle.FuelType.GetDisplayName()</td>
-                            <td><span class="rental-status @(vehicle.IsRented ? "is-active" : "is-available")"><i></i>@(vehicle.IsRented ? "Alugado" : "Disponível")</span></td>
-                            <td><div class="row-actions"><a asp-action="Edit" asp-route-id="@vehicle.Id">Editar</a><a class="is-danger" asp-action="Delete" asp-route-id="@vehicle.Id">Eliminar</a></div></td>
+                            <td>@T.Fuel(vehicle.FuelType)</td>
+                            <td><span class="rental-status @(vehicle.IsRented ? "is-active" : "is-available")"><i></i>@T[vehicle.IsRented ? "status.rented" : "status.available"]</span></td>
+                            <td><div class="row-actions"><a asp-action="Edit" asp-route-id="@vehicle.Id">@T["common.edit"]</a><a class="is-danger" asp-action="Delete" asp-route-id="@vehicle.Id">@T["common.delete"]</a></div></td>
                         </tr>
                     }
                 }

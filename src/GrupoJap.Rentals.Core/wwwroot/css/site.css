@@ -80,7 +80,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .workspace-caret { margin-left: auto; color: #aebdb2; font-size: 17px; }
 .nav-label { margin: 0 10px 10px; color: #96aa9b; font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: 1.2px; }
 .nav-label-secondary { margin-top: 31px; }
-.primary-nav { display: grid; align-content: start; gap: 4px; }
+.primary-nav { display: grid; align-content: start; gap: 4px; margin-top: 34px; }
 .nav-link { position: relative; display: flex; min-height: 42px; align-items: center; gap: 12px; padding: 0 10px; border-radius: 5px; color: #c7d2ca; font-size: 12px; transition: background 150ms ease, color 150ms ease; }
 .nav-link svg { width: 17px; height: 17px; color: #a8b9ad; }
 .nav-link.is-current { background: #ffffff13; color: #fff; font-weight: 600; }
@@ -370,7 +370,6 @@ body, .panel, .topbar, .field-group input, .field-group select { transition: bac
 .auth-shell { display: grid; min-height: 100vh; align-content: center; justify-items: center; gap: 22px; padding: 32px 16px; }
 .auth-brand { display: flex; align-items: center; gap: 11px; color: var(--ink); }
 .auth-brand .brand-copy small { color: var(--muted); }
-.auth-theme-toggle { position: fixed; top: 16px; right: 16px; }
 .auth-card { display: grid; width: 100%; max-width: 420px; gap: 18px; padding: 28px; }
 .auth-card h1 { margin: 4px 0; font-family: "Space Grotesk", sans-serif; font-size: 24px; }
 .auth-form { display: grid; gap: 14px; }
@@ -399,11 +398,15 @@ a.user-profile:hover { background: #ffffff0d; }
 :root[data-theme="dark"] .field-group input[readonly] { background: #1f2722; }
 .field-group input[type="file"] { padding: 6px; min-height: 0; }
 
-/* ---- Botao de acesso ao site (sidebar) ---- */
-.site-button { display: flex; width: 100%; min-height: 58px; align-items: center; gap: 10px; margin: 34px 0 27px; padding: 8px 12px; border: 1px solid #ffffff1c; border-radius: 7px; background: #ffffff08; color: #f9fbf8; font: inherit; text-align: left; cursor: pointer; transition: border-color 160ms ease, background 160ms ease; }
-.site-button:hover { border-color: var(--yellow); background: #ffffff12; }
-.site-button svg { width: 20px; height: 20px; flex: 0 0 auto; color: var(--yellow); }
-.site-button > span:nth-of-type(1) { display: grid; min-width: 0; gap: 3px; }
-.site-button strong { font-size: 12px; font-weight: 600; }
-.site-button small { color: #b5c0b8; font-size: 10px; }
-.site-button-arrow { margin-left: auto; color: #aebdb2; font-size: 15px; }
+/* ---- Seletor de idioma (ao lado do modo noturno) ---- */
+.lang-menu { position: relative; }
+.lang-toggle { width: auto; min-width: 36px; grid-auto-flow: column; gap: 6px; padding: 0 9px; list-style: none; font-family: "DM Mono", monospace; font-size: 11px; font-weight: 500; }
+.lang-toggle::-webkit-details-marker { display: none; }
+.lang-toggle svg { width: 16px; height: 16px; }
+.lang-menu[open] .lang-toggle, .lang-toggle:hover { border-color: var(--green); }
+.lang-dropdown { position: absolute; z-index: 40; right: 0; top: calc(100% + 8px); display: grid; min-width: 168px; margin: 0; padding: 6px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); box-shadow: 0 18px 40px -18px #0006; list-style: none; }
+.lang-dropdown a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 5px; color: var(--ink); font-size: 12px; }
+.lang-dropdown a:hover { background: var(--canvas); }
+.lang-dropdown a[aria-current="true"] { background: var(--green-wash); font-weight: 700; }
+.lang-code { display: inline-grid; min-width: 26px; place-items: center; padding: 2px 4px; border-radius: 4px; background: var(--green-dark); color: #fff; font-family: "DM Mono", monospace; font-size: 10px; }
+.auth-toolbar { position: fixed; z-index: 40; top: 16px; right: 16px; display: flex; align-items: flex-start; gap: 8px; }

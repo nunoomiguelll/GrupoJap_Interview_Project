@@ -6,7 +6,7 @@ namespace GrupoJap.Rentals.Localization;
 /// <summary>
 /// Cache em memória de todas as traduções da base de dados (idioma → chave → texto).
 /// É recarregada quando expira (<c>Translations:CacheSeconds</c>, 10 s por omissão) ou quando a
-/// administração guarda uma alteração, por isso o site reflete as edições sem reiniciar.
+/// administração guarda uma alteração, por isso o painel reflete as edições sem reiniciar.
 /// </summary>
 public sealed class TranslationStore(IServiceScopeFactory scopeFactory, IConfiguration configuration, ILogger<TranslationStore> logger)
 {
@@ -71,7 +71,7 @@ public sealed class TranslationStore(IServiceScopeFactory scopeFactory, IConfigu
         }
         catch (Exception exception)
         {
-            // Sem base de dados (ou sem a migration aplicada) o site continua a funcionar com os textos do catálogo.
+            // Sem base de dados (ou sem a migration aplicada) o painel continua a funcionar com os textos do catálogo.
             logger.LogWarning(exception, "Não foi possível carregar as traduções; a usar a cache anterior ou os textos por omissão.");
             return new Snapshot(previous?.Values ?? new Dictionary<string, IReadOnlyDictionary<string, string>>(), DateTime.UtcNow);
         }

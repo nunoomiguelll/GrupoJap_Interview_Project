@@ -18,6 +18,14 @@ public static class TranslationSeeder
             .ToDictionaryAsync(t => t.Key, StringComparer.Ordinal);
 
         var now = DateTime.UtcNow;
+
+        // Chaves do antigo site público: já não são usadas por nenhuma vista.
+        foreach (var obsolete in existing.Values.Where(t => TranslationCatalog.IsRetired(t.Key) && TranslationCatalog.Find(t.Key) is null).ToList())
+        {
+            db.Translations.Remove(obsolete);
+            existing.Remove(obsolete.Key);
+        }
+
         foreach (var entry in TranslationCatalog.Entries)
         {
             if (!existing.TryGetValue(entry.Key, out var translation))
@@ -53,7 +61,7 @@ public static class TranslationSeeder
         }
         catch (DbUpdateException exception)
         {
-            // O site e a administração podem arrancar ao mesmo tempo: se a outra aplicação já inseriu
+            // Se duas instâncias arrancarem ao mesmo tempo e a outra já inseriu
             // as mesmas chaves, a violação do índice único é esperada e o catálogo já está na base de dados.
             services.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(TranslationSeeder))
                 .LogInformation(exception, "Traduções já inseridas por outra instância; a ignorar.");

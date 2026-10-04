@@ -69,47 +69,6 @@ public sealed class AccountController(
         return View(model);
     }
 
-    [HttpGet("register")]
-    [AllowAnonymous]
-    public IActionResult Register() => !AllowRegistration ? NotFound() : User.Identity?.IsAuthenticated == true
-        ? LocalRedirect(HomePath)
-        : View(new RegisterViewModel());
-
-    [HttpPost("register")]
-    [AllowAnonymous]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(RegisterViewModel model)
-    {
-        if (!AllowRegistration)
-        {
-            return NotFound();
-        }
-
-        if (!ModelState.IsValid)
-        {
-            return View(model);
-        }
-
-        var email = model.Email.Trim();
-        var user = new ApplicationUser { UserName = email, Email = email, FullName = model.FullName.Trim() };
-        var result = await userManager.CreateAsync(user, model.Password);
-
-        if (!result.Succeeded)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, TranslateError(error));
-            }
-
-            return View(model);
-        }
-
-        // O registo público cria sempre utilizadores normais; o perfil Admin só é atribuído internamente.
-        await userManager.AddToRoleAsync(user, AppRoles.User);
-        await signInManager.SignInAsync(user, isPersistent: false);
-        return LocalRedirect(HomePath);
-    }
-
     [HttpPost("logout")]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
@@ -127,20 +86,6 @@ public sealed class AccountController(
 
     private bool AdminOnly => configuration.GetValue<bool>("Account:AdminOnly");
 
-    private bool AllowRegistration => configuration.GetValue<bool>("Account:AllowRegistration");
-
     private IActionResult RedirectAfterLogin(string? returnUrl)
         => !string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl) ? LocalRedirect(returnUrl) : LocalRedirect(HomePath);
-
-    private string TranslateError(IdentityError error) => error.Code switch
-    {
-        "DuplicateUserName" or "DuplicateEmail" => T["account.error.duplicate"],
-        "PasswordTooShort" => T["password.error.too_short"],
-        "PasswordRequiresDigit" => T["password.error.digit"],
-        "PasswordRequiresUpper" => T["password.error.upper"],
-        "PasswordRequiresLower" => T["password.error.lower"],
-        "PasswordRequiresNonAlphanumeric" => T["password.error.symbol"],
-        "InvalidEmail" or "InvalidUserName" => T["account.error.invalid_email"],
-        _ => error.Description
-    };
 }

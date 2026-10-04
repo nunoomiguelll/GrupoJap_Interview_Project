@@ -34,19 +34,19 @@ public sealed class TranslationFormViewModel
 {
     public int? Id { get; set; }
 
-    [Required(ErrorMessage = "A chave é obrigatória.")]
+    [Required(ErrorMessage = "validation.key_required")]
     [StringLength(200)]
-    [RegularExpression(@"^[a-z0-9]+([._-][a-zA-Z0-9]+)*$", ErrorMessage = "Usa letras minúsculas, números e pontos (ex.: home.hero.title).")]
-    [Display(Name = "Chave")]
+    [RegularExpression(@"^[a-z0-9]+([._-][a-zA-Z0-9]+)*$", ErrorMessage = "validation.key_format")]
+    [Display(Name = "field.key")]
     public string Key { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "A categoria é obrigatória.")]
+    [Required(ErrorMessage = "validation.category_required")]
     [StringLength(100)]
-    [Display(Name = "Categoria")]
+    [Display(Name = "field.category")]
     public string Category { get; set; } = string.Empty;
 
     [StringLength(500)]
-    [Display(Name = "Descrição (onde aparece / notas)")]
+    [Display(Name = "field.translation_notes")]
     public string? Description { get; set; }
 
     /// <summary>Texto por idioma (pt, en, es). O português é obrigatório por ser o idioma de recurso.</summary>

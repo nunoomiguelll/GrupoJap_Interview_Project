@@ -25,11 +25,12 @@ const rentalRows = [...document.querySelectorAll("[data-rental-row]")];
 const noSearchResults = document.querySelector("[data-no-results]");
 
 rentalSearch?.addEventListener("input", () => {
-	const searchTerm = rentalSearch.value.trim().toLocaleLowerCase("pt-PT");
+	const locale = document.documentElement.lang || undefined;
+	const searchTerm = rentalSearch.value.trim().toLocaleLowerCase(locale);
 	let visibleCount = 0;
 
 	for (const row of rentalRows) {
-		const matches = row.textContent.toLocaleLowerCase("pt-PT").includes(searchTerm);
+		const matches = row.textContent.toLocaleLowerCase(locale).includes(searchTerm);
 		row.hidden = !matches;
 		if (matches) visibleCount += 1;
 	}
@@ -43,7 +44,7 @@ const themeToggle = document.querySelector("[data-theme-toggle]");
 function applyTheme(theme) {
 	document.documentElement.dataset.theme = theme;
 	themeToggle?.setAttribute("aria-pressed", String(theme === "dark"));
-	themeToggle?.setAttribute("aria-label", theme === "dark" ? "Ativar modo claro" : "Ativar modo noturno");
+	themeToggle?.setAttribute("aria-label", (theme === "dark" ? themeToggle.dataset.labelLight : themeToggle.dataset.labelDark) || "");
 	document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#111613" : "#f4f5f0");
 }
 
@@ -66,89 +67,20 @@ photoInput?.addEventListener("change", () => {
 		const fallback = document.querySelector("[data-photo-preview-fallback]");
 		preview = document.createElement("img");
 		preview.className = "profile-photo";
-		preview.alt = "Pré-visualização da foto";
+		preview.alt = photoInput.dataset.previewAlt || "";
 		preview.setAttribute("data-photo-preview", "");
 		fallback?.replaceWith(preview);
 	}
 	preview.src = url;
 });
 
-// ---------- Site publico ----------
-const siteMenuButton = document.querySelector("[data-site-menu]");
-siteMenuButton?.addEventListener("click", () => {
-	const open = !document.body.classList.contains("site-menu-open");
-	document.body.classList.toggle("site-menu-open", open);
-	siteMenuButton.setAttribute("aria-expanded", String(open));
-});
-
-// Fecha o menu de conta ao clicar fora ou com Escape.
+// Fecha o seletor de idioma ao clicar fora ou com Escape.
 document.addEventListener("click", (event) => {
-	for (const menu of document.querySelectorAll(".account-menu[open]")) {
+	for (const menu of document.querySelectorAll(".lang-menu[open]")) {
 		if (!menu.contains(event.target)) menu.removeAttribute("open");
 	}
 });
 document.addEventListener("keydown", (event) => {
 	if (event.key !== "Escape") return;
-	document.querySelectorAll(".account-menu[open]").forEach((menu) => menu.removeAttribute("open"));
-	document.body.classList.remove("site-menu-open");
+	document.querySelectorAll(".lang-menu[open]").forEach((menu) => menu.removeAttribute("open"));
 });
-
-// Datas ligadas: a devolucao tem de ser depois do levantamento; mostra o numero de dias.
-function addDays(isoDate, days) {
-	const date = new Date(isoDate + "T00:00:00");
-	date.setDate(date.getDate() + days);
-	return date.toISOString().slice(0, 10);
-}
-
-for (const form of document.querySelectorAll("[data-date-range]")) {
-	const startInput = form.querySelector("[data-range-start]");
-	const endInput = form.querySelector("[data-range-end]");
-	const daysLabel = form.querySelector("[data-range-days]");
-	if (!startInput || !endInput) continue;
-
-	const sync = () => {
-		if (startInput.value) {
-			const minEnd = addDays(startInput.value, 1);
-			endInput.min = minEnd;
-			if (endInput.value && endInput.value < minEnd) endInput.value = minEnd;
-		}
-		if (daysLabel) {
-			if (startInput.value && endInput.value && endInput.value > startInput.value) {
-				const days = Math.round((new Date(endInput.value) - new Date(startInput.value)) / 86400000) + 1;
-				daysLabel.textContent = (daysLabel.dataset.template || "{0} dia(s) de aluguer").replace("{0}", days);
-				daysLabel.hidden = false;
-			} else {
-				daysLabel.hidden = true;
-			}
-		}
-	};
-
-	startInput.addEventListener("change", sync);
-	endInput.addEventListener("change", sync);
-	sync();
-}
-
-// Confirmacao antes de acoes destrutivas (ex.: cancelar reserva).
-for (const form of document.querySelectorAll("form[data-confirm]")) {
-	form.addEventListener("submit", (event) => {
-		if (!window.confirm(form.dataset.confirm)) event.preventDefault();
-	});
-}
-
-// Video do hero: so aparece depois de comecar a reproduzir; pausa quando fora do ecra ou com movimento reduzido.
-const heroVideo = document.querySelector("[data-hero-video]");
-if (heroVideo) {
-	const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-	const tryPlay = () => {
-		if (reduceMotion.matches) return;
-		heroVideo.play().then(() => heroVideo.classList.add("is-playing")).catch(() => { /* autoplay bloqueado: fica o fundo em gradiente */ });
-	};
-	heroVideo.addEventListener("playing", () => heroVideo.classList.add("is-playing"));
-	if ("IntersectionObserver" in window) {
-		new IntersectionObserver(([entry]) => {
-			if (entry.isIntersecting) tryPlay(); else heroVideo.pause();
-		}).observe(heroVideo);
-	} else {
-		tryPlay();
-	}
-}

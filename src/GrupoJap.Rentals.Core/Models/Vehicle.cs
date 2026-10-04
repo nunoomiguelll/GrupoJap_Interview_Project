@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using GrupoJap.Rentals.Localization;
 using Microsoft.EntityFrameworkCore;
 
 namespace GrupoJap.Rentals.Models;
@@ -8,30 +9,30 @@ public sealed class Vehicle : IValidatableObject
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "A marca é obrigatória.")]
+    [Required(ErrorMessage = "validation.brand_required")]
     [StringLength(80)]
-    [Display(Name = "Marca")]
+    [Display(Name = "field.brand")]
     public string Brand { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "O modelo é obrigatório.")]
+    [Required(ErrorMessage = "validation.model_required")]
     [StringLength(80)]
-    [Display(Name = "Modelo")]
+    [Display(Name = "field.model")]
     public string Model { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "A matrícula é obrigatória.")]
+    [Required(ErrorMessage = "validation.registration_required")]
     [StringLength(15)]
-    [Display(Name = "Matrícula")]
+    [Display(Name = "field.registration")]
     public string Registration { get; set; } = string.Empty;
 
-    [Range(1, int.MaxValue, ErrorMessage = "Indica um ano de fabrico válido.")]
-    [Display(Name = "Ano de fabrico")]
+    [Range(1, int.MaxValue, ErrorMessage = "validation.year_invalid")]
+    [Display(Name = "field.year")]
     public int YearOfManufacture { get; set; }
 
-    [Display(Name = "Tipo de combustível")]
+    [Display(Name = "field.fuel_type")]
     public FuelType FuelType { get; set; }
 
-    [Range(0, 2_000_000, ErrorMessage = "A quilometragem tem de estar entre 0 e 2 000 000 km.")]
-    [Display(Name = "Quilometragem atual")]
+    [Range(0, 2_000_000, ErrorMessage = "validation.mileage_range")]
+    [Display(Name = "field.mileage")]
     public int Mileage { get; set; }
 
     public ICollection<RentalContract> RentalContracts { get; set; } = new List<RentalContract>();
@@ -41,14 +42,14 @@ public sealed class Vehicle : IValidatableObject
         if (YearOfManufacture > DateTime.Today.Year)
         {
             yield return new ValidationResult(
-                "O ano de fabrico não pode ser posterior ao ano atual.",
+                validationContext.Text("validation.year_future"),
                 [nameof(YearOfManufacture)]);
         }
 
         if (!Enum.IsDefined(FuelType) || FuelType == FuelType.Unspecified)
         {
             yield return new ValidationResult(
-                "Seleciona um tipo de combustível.",
+                validationContext.Text("validation.fuel_required"),
                 [nameof(FuelType)]);
         }
     }

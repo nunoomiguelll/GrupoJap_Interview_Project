@@ -1,15 +1,14 @@
 @model GrupoJap.Rentals.ViewModels.TranslationFormViewModel
-@using GrupoJap.Rentals.Localization
 @{
     var isEdit = Model.Id is not null;
-    ViewData["Title"] = isEdit ? "Editar tradução" : "Nova tradução";
+    ViewData["Title"] = T[isEdit ? "tr.edit_title" : "tr.add"].Value;
     var returnUrl = ViewData["ReturnUrl"] as string;
 }
 
 <section class="management-page form-page">
     <div class="page-heading management-heading">
         <div>
-            <p class="eyebrow">TRADUÇÕES <span>·</span> @(isEdit ? "EDIÇÃO" : "NOVA")</p>
+            <partial name="_Eyebrow" model="@T[isEdit ? "tr.eyebrow_edit" : "tr.eyebrow_new"].Value" />
             <h1>@ViewData["Title"]</h1>
             <p class="heading-copy">
                 @if (isEdit)
@@ -18,11 +17,11 @@
                 }
                 else
                 {
-                    <span>Depois de criada, usa <code>@@T["chave"]</code> numa vista do site para mostrar o texto.</span>
+                    <span>@T["tr.create_hint"]</span>
                 }
             </p>
         </div>
-        <a class="secondary-button" href="@(returnUrl ?? Url.Action("Index"))"><span aria-hidden="true">←</span> Voltar às traduções</a>
+        <a class="secondary-button" href="@(returnUrl ?? Url.Action("Index"))"><span aria-hidden="true">←</span> @T["tr.back"]</a>
     </div>
 
     <form method="post" asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@Model.Id" class="panel entity-form">
@@ -35,17 +34,17 @@
                 @if (isEdit)
                 {
                     <input asp-for="Key" readonly />
-                    <small class="field-hint">A chave é usada no código do site e não pode ser alterada.</small>
+                    <small class="field-hint">@T["tr.key_readonly"]</small>
                 }
                 else
                 {
-                    <input asp-for="Key" maxlength="200" autocomplete="off" placeholder="Ex.: home.promo.title" autofocus />
+                    <input asp-for="Key" maxlength="200" autocomplete="off" placeholder="@T["tr.key_placeholder"]" autofocus />
                     <span asp-validation-for="Key"></span>
                 }
             </div>
             <div class="field-group">
                 <label asp-for="Category"></label>
-                <input asp-for="Category" maxlength="100" list="translation-categories" autocomplete="off" placeholder="Ex.: Página inicial" />
+                <input asp-for="Category" maxlength="100" list="translation-categories" autocomplete="off" placeholder="@T["tr.category_placeholder"]" />
                 <datalist id="translation-categories">
                     @foreach (var category in Model.Categories)
                     {
@@ -57,7 +56,7 @@
         </div>
         <div class="field-group">
             <label asp-for="Description"></label>
-            <input asp-for="Description" maxlength="500" placeholder="Ex.: Título da secção de destaques" />
+            <input asp-for="Description" maxlength="500" placeholder="@T["tr.description_placeholder"]" />
             <span asp-validation-for="Description"></span>
         </div>
 
@@ -69,28 +68,28 @@
                 var isDefault = language.Code == SiteLanguages.Default;
                 var original = Model.Defaults?.GetValueOrDefault(language.Code);
                 <div class="field-group translation-language">
-                    <label for="@fieldId"><span class="lang-badge">@language.Code.ToUpperInvariant()</span> @language.Name @(isDefault ? "(obrigatório)" : "")</label>
+                    <label for="@fieldId"><span class="lang-badge">@language.Code.ToUpperInvariant()</span> @language.Name @(isDefault ? T["tr.required"].Value : "")</label>
                     <textarea id="@fieldId" name="@fieldName" rows="3" lang="@language.Culture" required="@isDefault">@Model.Values.GetValueOrDefault(language.Code)</textarea>
                     @Html.ValidationMessage(fieldName)
                     @if (!string.IsNullOrEmpty(original))
                     {
-                        <small class="field-hint">Original: <span>@original</span> <button class="text-button" type="button" data-fill-target="@fieldId" data-fill-value="@original">Repor</button></small>
+                        <small class="field-hint">@T["tr.original"] <span>@original</span> <button class="text-button" type="button" data-fill-target="@fieldId" data-fill-value="@original">@T["tr.reset"]</button></small>
                     }
                     else if (!isDefault)
                     {
-                        <small class="field-hint">Se ficar vazio, o site mostra o texto em português.</small>
+                        <small class="field-hint">@T["tr.empty_hint"]</small>
                     }
                 </div>
             }
         </div>
 
-        <div class="form-actions"><a class="secondary-button" href="@(returnUrl ?? Url.Action("Index"))">Cancelar</a><button class="primary-button" type="submit">@(isEdit ? "Guardar alterações" : "Criar tradução") <span aria-hidden="true">→</span></button></div>
+        <div class="form-actions"><a class="secondary-button" href="@(returnUrl ?? Url.Action("Index"))">@T["common.cancel"]</a><button class="primary-button" type="submit">@T[isEdit ? "common.save_changes" : "tr.create"] <span aria-hidden="true">→</span></button></div>
     </form>
 </section>
 @section Scripts {
     <partial name="_FormScripts" />
     <script>
-        // "Repor": volta a colocar o texto original do catálogo no campo (só fica guardado ao submeter).
+        // Reset: puts the catalog's original text back into the field (only saved on submit).
         for (const button of document.querySelectorAll("[data-fill-target]")) {
             button.addEventListener("click", () => {
                 const field = document.getElementById(button.dataset.fillTarget);

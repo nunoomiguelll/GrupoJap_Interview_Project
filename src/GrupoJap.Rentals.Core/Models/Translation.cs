@@ -2,24 +2,24 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GrupoJap.Rentals.Models;
 
-/// <summary>Texto traduzível do site, identificado por uma chave estável (ex.: <c>home.hero.title</c>).</summary>
+/// <summary>Texto traduzível do painel, identificado por uma chave estável (ex.: <c>dash.hero.title</c>).</summary>
 public sealed class Translation
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "A chave é obrigatória.")]
+    [Required(ErrorMessage = "validation.key_required")]
     [StringLength(200)]
-    [RegularExpression(@"^[a-z0-9]+([._-][a-zA-Z0-9]+)*$", ErrorMessage = "Usa letras minúsculas, números e pontos (ex.: home.hero.title).")]
-    [Display(Name = "Chave")]
+    [RegularExpression(@"^[a-z0-9]+([._-][a-zA-Z0-9]+)*$", ErrorMessage = "validation.key_format")]
+    [Display(Name = "field.key")]
     public string Key { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "A categoria é obrigatória.")]
+    [Required(ErrorMessage = "validation.category_required")]
     [StringLength(100)]
-    [Display(Name = "Categoria")]
+    [Display(Name = "field.category")]
     public string Category { get; set; } = string.Empty;
 
     [StringLength(500)]
-    [Display(Name = "Descrição")]
+    [Display(Name = "field.description")]
     public string? Description { get; set; }
 
     public DateTime CreatedAt { get; set; }

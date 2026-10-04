@@ -4,24 +4,24 @@ namespace GrupoJap.Rentals.Models;
 
 public enum FuelType
 {
-    [Display(Name = "Por selecionar")]
+    [Display(Name = "fuel.Unspecified")]
     Unspecified = 0,
 
-    [Display(Name = "Gasolina")]
+    [Display(Name = "fuel.Petrol")]
     Petrol = 1,
 
-    [Display(Name = "Gasóleo")]
+    [Display(Name = "fuel.Diesel")]
     Diesel = 2,
 
-    [Display(Name = "Híbrido")]
+    [Display(Name = "fuel.Hybrid")]
     Hybrid = 3,
 
-    [Display(Name = "Elétrico")]
+    [Display(Name = "fuel.Electric")]
     Electric = 4,
 
-    [Display(Name = "GPL")]
+    [Display(Name = "fuel.Lpg")]
     Lpg = 5,
 
-    [Display(Name = "Outro")]
+    [Display(Name = "fuel.Other")]
     Other = 6
 }

@@ -27,7 +27,7 @@
             }
             <div class="field-group">
                 <label asp-for="Photo"></label>
-                <input asp-for="Photo" type="file" accept="image/jpeg,image/png,image/webp" data-photo-input />
+                <input asp-for="Photo" type="file" accept="image/jpeg,image/png,image/webp" data-photo-input data-preview-alt="@T["profile.photo_preview_alt"]" />
                 <small class="field-hint">@T["profile.photo_hint"]</small>
                 <span asp-validation-for="Photo"></span>
                 @if (!string.IsNullOrEmpty(Model.PhotoPath))
@@ -41,7 +41,7 @@
             <div class="field-group"><label asp-for="Email"></label><input asp-for="Email" readonly /></div>
             <div class="field-group"><label>@T["profile.role"]</label><input value="@Model.RoleLabel" readonly /></div>
             <div class="field-group"><label asp-for="FullName"></label><input asp-for="FullName" autocomplete="name" maxlength="150" /><span asp-validation-for="FullName"></span></div>
-            <div class="field-group"><label asp-for="PhoneNumber"></label><input asp-for="PhoneNumber" type="tel" inputmode="numeric" maxlength="9" placeholder="@T["booking.phone_placeholder"]" /><span asp-validation-for="PhoneNumber"></span></div>
+            <div class="field-group"><label asp-for="PhoneNumber"></label><input asp-for="PhoneNumber" type="tel" inputmode="numeric" maxlength="9" placeholder="@T["field.phone_placeholder"]" /><span asp-validation-for="PhoneNumber"></span></div>
             <div class="field-group"><label asp-for="JobTitle"></label><input asp-for="JobTitle" maxlength="100" placeholder="@T["profile.job_placeholder"]" /><span asp-validation-for="JobTitle"></span></div>
             <div class="field-group">
                 <label asp-for="FavoriteBrand"></label>

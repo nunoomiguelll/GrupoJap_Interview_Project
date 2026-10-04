@@ -1,8 +1,8 @@
 @model Vehicle
 <div class="form-grid">
-    <div class="field-group"><label asp-for="Brand"></label><input asp-for="Brand" autocomplete="organization" maxlength="80" placeholder="Ex.: Toyota" /><span asp-validation-for="Brand"></span></div>
-    <div class="field-group"><label asp-for="Model"></label><input asp-for="Model" maxlength="80" placeholder="Ex.: Corolla" /><span asp-validation-for="Model"></span></div>
-    <div class="field-group"><label asp-for="Registration"></label><input asp-for="Registration" maxlength="15" autocomplete="off" placeholder="Ex.: AA-00-BB" /><span asp-validation-for="Registration"></span></div>
+    <div class="field-group"><label asp-for="Brand"></label><input asp-for="Brand" autocomplete="organization" maxlength="80" placeholder="@T["profile.brand_placeholder"]" /><span asp-validation-for="Brand"></span></div>
+    <div class="field-group"><label asp-for="Model"></label><input asp-for="Model" maxlength="80" placeholder="@T["vehicles.placeholder_model"]" /><span asp-validation-for="Model"></span></div>
+    <div class="field-group"><label asp-for="Registration"></label><input asp-for="Registration" maxlength="15" autocomplete="off" placeholder="@T["vehicles.placeholder_registration"]" /><span asp-validation-for="Registration"></span></div>
     <div class="field-group"><label asp-for="YearOfManufacture"></label><input asp-for="YearOfManufacture" type="number" min="1" max="@DateTime.Today.Year" inputmode="numeric" /><span asp-validation-for="YearOfManufacture"></span></div>
     <div class="field-group"><label asp-for="FuelType"></label><select asp-for="FuelType" asp-items="Html.GetEnumSelectList<FuelType>()"></select><span asp-validation-for="FuelType"></span></div>
     <div class="field-group"><label asp-for="Mileage"></label><input asp-for="Mileage" type="number" min="0" step="1" inputmode="numeric" /><span asp-validation-for="Mileage"></span></div>

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using GrupoJap.Rentals.Localization;
 
 namespace GrupoJap.Rentals.Models;
 
@@ -6,31 +7,31 @@ public sealed class RentalContract : IValidatableObject
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "Seleciona um cliente.")]
-    [Range(1, int.MaxValue, ErrorMessage = "Seleciona um cliente válido.")]
-    [Display(Name = "Cliente")]
+    [Required(ErrorMessage = "validation.customer_required")]
+    [Range(1, int.MaxValue, ErrorMessage = "validation.customer_invalid")]
+    [Display(Name = "field.customer")]
     public int? CustomerId { get; set; }
 
     public Customer? Customer { get; set; }
 
-    [Required(ErrorMessage = "Seleciona um veículo.")]
-    [Range(1, int.MaxValue, ErrorMessage = "Seleciona um veículo válido.")]
-    [Display(Name = "Veículo")]
+    [Required(ErrorMessage = "validation.vehicle_required")]
+    [Range(1, int.MaxValue, ErrorMessage = "validation.vehicle_invalid")]
+    [Display(Name = "field.vehicle")]
     public int? VehicleId { get; set; }
 
     public Vehicle? Vehicle { get; set; }
 
-    [Required(ErrorMessage = "A data de início é obrigatória.")]
-    [Display(Name = "Data de início")]
+    [Required(ErrorMessage = "validation.start_required")]
+    [Display(Name = "field.start_date")]
     public DateOnly? StartDate { get; set; }
 
-    [Required(ErrorMessage = "A data de fim é obrigatória.")]
-    [Display(Name = "Data de fim")]
+    [Required(ErrorMessage = "validation.end_required")]
+    [Display(Name = "field.end_date")]
     public DateOnly? EndDate { get; set; }
 
-    [Required(ErrorMessage = "A quilometragem inicial é obrigatória.")]
-    [Range(0, int.MaxValue, ErrorMessage = "A quilometragem inicial não pode ser negativa.")]
-    [Display(Name = "Quilometragem inicial")]
+    [Required(ErrorMessage = "validation.initial_mileage_required")]
+    [Range(0, int.MaxValue, ErrorMessage = "validation.initial_mileage_negative")]
+    [Display(Name = "field.initial_mileage")]
     public int? InitialMileage { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -40,14 +41,14 @@ public sealed class RentalContract : IValidatableObject
         if (StartDate is DateOnly startDate && startDate < today)
         {
             yield return new ValidationResult(
-                "A data de início não pode ser anterior à data atual.",
+                validationContext.Text("validation.start_past"),
                 [nameof(StartDate)]);
         }
 
         if (StartDate is DateOnly start && EndDate is DateOnly end && end <= start)
         {
             yield return new ValidationResult(
-                "A data de fim tem de ser posterior à data de início.",
+                validationContext.Text("validation.end_after_start"),
                 [nameof(EndDate)]);
         }
     }

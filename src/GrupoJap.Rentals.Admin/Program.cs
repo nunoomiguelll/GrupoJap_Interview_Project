@@ -28,7 +28,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRentalsUploads();
-app.UseRentalsLocalization(multilingual: false);
+app.UseRentalsLocalization();
 app.UseRouting();
 
 app.UseAuthentication();

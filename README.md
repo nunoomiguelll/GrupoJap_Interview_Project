@@ -13,29 +13,26 @@ O projeto MVC, as entidades iniciais (`Vehicle`, `Customer` e `RentalContract`),
 
 ## Estrutura da solucao
 
-A solucao (`GrupoJap.slnx`) tem tres projetos que partilham a mesma base de dados mas correm como aplicacoes independentes:
+A solucao (`GrupoJap.slnx`) tem duas aplicacoes e os testes. O site publico foi removido: o foco e o painel de administracao.
 
 | Projeto | Funcao | URL (dev) |
 |---|---|---|
-| `src/GrupoJap.Rentals.Web` | Site publico (frota, reservas, conta do cliente) | http://localhost:5168 |
-| `src/GrupoJap.Rentals.Admin` | Painel de administracao (veiculos, clientes, contratos) | http://localhost:5169 |
-| `src/GrupoJap.Rentals.Core` | Biblioteca partilhada: modelos, `ApplicationDbContext`, migrations, servicos, login/perfil e assets comuns (CSS/JS/bootstrap) | n/a |
+| `src/GrupoJap.Rentals.Admin` | Painel de administracao (veiculos, clientes, contratos, traducoes, perfil) | http://localhost:5169 |
+| `src/GrupoJap.Rentals.Core` | Biblioteca partilhada: modelos, `ApplicationDbContext`, migrations, servicos, traducoes, login/perfil e assets comuns (CSS/JS/bootstrap) | n/a |
+| `tests/GrupoJap.Rentals.Tests` | Testes xUnit | n/a |
 
-- Cada aplicacao tem sessao propria (cookies distintos). O Admin so aceita contas com o perfil `Admin` e nao permite registo; o Web permite registo de clientes.
-- As fotos de perfil ficam em `uploads/` na raiz da solucao (`Uploads:Path`), servidas por ambas em `/uploads`.
-- Os links entre as duas apps vem de `Urls:Admin` (Web) e `Urls:Site` (Admin) nos `appsettings.json`.
+- O Admin so aceita contas com o perfil `Admin` e nao permite registo.
+- As fotos de perfil ficam em `uploads/` na raiz da solucao (`Uploads:Path`), servidas em `/uploads`.
 
 ## Configuracao local
 
-A connection string de desenvolvimento esta em `appsettings.Development.json` de cada app e usa SQL Server Express (`localhost\SQLEXPRESS`) com autenticacao do Windows. O utilizador administrador e os dados de demonstracao (`SeedAdmin`, `SeedDemoData`) sao criados pelo Admin ao arrancar.
+A connection string de desenvolvimento esta em `appsettings.Development.json` do Admin e usa SQL Server Express (`localhost\SQLEXPRESS`) com autenticacao do Windows. O utilizador administrador e os dados de demonstracao (`SeedAdmin`, `SeedDemoData`) sao criados pelo Admin ao arrancar.
 
 ```powershell
 dotnet restore
 dotnet tool restore
 dotnet ef database update --project src/GrupoJap.Rentals.Core --startup-project src/GrupoJap.Rentals.Admin
 
-# correr so uma das aplicacoes (ou as duas, em terminais separados)
-dotnet run --project src/GrupoJap.Rentals.Web
 dotnet run --project src/GrupoJap.Rentals.Admin
 
 dotnet test tests/GrupoJap.Rentals.Tests
@@ -104,8 +101,8 @@ Nao colocar credenciais reais em ficheiros versionados. Para ambientes partilhad
 
 ## Autenticacao e perfis
 
-- ASP.NET Core Identity com perfis `Admin` e `User` (`Models/AppRoles.cs`). Painel (Painel, Veiculos, Clientes, Alugueres) so acessivel a `Admin`; utilizadores normais veem apenas `/account`.
-- O registo publico (`/account/register`) cria sempre utilizadores `User`. O perfil `Admin` so e atribuido internamente.
+- ASP.NET Core Identity com perfis `Admin` e `User` (`Models/AppRoles.cs`). Todo o painel so e acessivel a `Admin`.
+- Nao ha registo publico: o perfil `Admin` e atribuido internamente (seed) e o login do Admin rejeita contas sem esse perfil.
 - O administrador inicial e criado no arranque por `Data/IdentitySeeder.cs` a partir da seccao `SeedAdmin` de `appsettings.Development.json` (`admin@admin.com`). Em producao definir `SeedAdmin__Email` e `SeedAdmin__Password` por variaveis de ambiente/User Secrets e **alterar a palavra-passe**; nao versionar credenciais reais.
 - Bloqueio de conta apos 5 tentativas falhadas (5 minutos). Migration: `AddIdentity`.
 
@@ -116,27 +113,15 @@ Nao colocar credenciais reais em ficheiros versionados. Para ambientes partilhad
 - Fotos: JPG/PNG/WebP até 2 MB, validadas pelos primeiros bytes do ficheiro (não pela extensão), gravadas em `wwwroot/uploads/avatars` (ignorado pelo Git). A foto anterior é apagada ao substituir ou remover.
 - Alterar palavra-passe em `/profile/password`.
 
-## Site publico (inspirado em benecar.pt)
+## Dados de demonstracao
 
-- Rotas: `/` (inicio), `/viaturas` (frota com filtros e paginacao), `/viaturas/{id}` (detalhe + reserva), `/conta/reservas` (area de cliente). O painel passou para `/admin`.
-- Disponibilidade calculada a partir dos contratos (datas inclusivas) em `Services/RentalAvailabilityService.cs`, partilhado com o backoffice.
-- Reserva online (`Services/BookingService.cs`): aplica as regras do PDF (inicio >= hoje, fim > inicio, sem sobreposicao), cria a ficha de cliente na primeira reserva (telefone e carta obrigatorios) e usa a quilometragem atual do veiculo como quilometragem inicial. Verificacao e insercao numa transacao `Serializable`.
-- Cancelamento pelo cliente apenas antes do inicio do aluguer.
-- Ficha de cliente associada a conta pelo email.
 - `SeedDemoData` (so em desenvolvimento) cria frota, clientes e contratos de demonstracao quando a frota esta vazia.
-- Estilos em `wwwroot/css/public.css` (tons do backoffice + acento neon).
-
-## Video do hero
-
-- `wwwroot/media/hero-sportscar.mp4`: "A red sports car traveling along a curvy asphalt road" ([Mixkit](https://mixkit.co/free-stock-video/a-red-sports-car-traveling-along-a-curvy-asphalt-road-52427/), licenca Mixkit: uso livre sem atribuicao obrigatoria). Para trocar, substituir o ficheiro (ou alterar a `source` em `Views/Site/Index.cshtml`).
-- Reproduz em loop, sem som, e pausa quando sai do ecra. Com "reduzir movimento" ativo no sistema, nao e carregado e fica o fundo em gradiente.
 
 ## Idiomas e traducoes
 
-- O site publico esta em **portugues, ingles e espanhol**. O idioma escolhe-se no seletor do cabecalho (guardado num cookie); na primeira visita segue o idioma do browser. A administracao fica sempre em portugues.
-- O modo noturno existe apenas na administracao (`Ui:DarkMode` no `appsettings.json` do Admin).
-- Os textos vivem nas tabelas `Translations` (chave, categoria, descricao) e `TranslationValues` (um texto por idioma), seguindo o modelo do projeto base.
-- **Admin > Traducoes** (`/translations`) permite pesquisar, filtrar por categoria ou por textos em falta, editar, criar e eliminar. O site reflete as alteracoes em ~10 s (`Translations:CacheSeconds`).
-- Os valores iniciais estao em `src/GrupoJap.Rentals.Core/Localization/TranslationCatalog.cs`. Ao arrancar, as chaves em falta sao inseridas na base de dados sem alterar o que ja foi editado. Eliminar uma traducao do catalogo equivale a repor o texto original.
+- O painel esta em **portugues, ingles e espanhol**. O idioma escolhe-se no botao com o globo, ao lado do modo noturno (barra superior e ecra de login); a escolha fica num cookie (`.GrupoJap.Language`, 1 ano). Sem escolha, o painel abre em portugues.
+- Os textos vivem nas tabelas `Translations` (chave, categoria, descricao) e `TranslationValues` (um texto por idioma).
+- **Traducoes** (`/translations`) permite pesquisar, filtrar por categoria ou por textos em falta, editar, criar e eliminar. As alteracoes aparecem de imediato (a cache e descartada ao guardar; expira sozinha em `Translations:CacheSeconds`, 10 s por omissao).
+- Os valores iniciais estao em `src/GrupoJap.Rentals.Core/Localization/TranslationCatalog.cs`. Ao arrancar, as chaves em falta sao inseridas na base de dados sem alterar o que ja foi editado, e as chaves do antigo site publico (`TranslationCatalog.RetiredPrefixes`/`RetiredKeys`) sao removidas. Eliminar uma traducao do catalogo equivale a repor o texto original.
 - Ordem de recurso de cada texto: BD (idioma atual) -> catalogo (idioma atual) -> BD (portugues) -> catalogo (portugues) -> chave.
-- Nas vistas: `@T["chave"]` ou `@T["chave", argumento]`; nas DataAnnotations usa-se a chave em `ErrorMessage`/`Display(Name)`.
+- Nas vistas: `@T["chave"]` ou `@T["chave", argumento]`; nos modelos usa-se a chave em `ErrorMessage`/`Display(Name)` (e `validationContext.Text("chave")` nas validacoes `IValidatableObject`). Para um texto novo: criar a entrada no catalogo e usar a chave.

@@ -9,12 +9,12 @@ using Microsoft.EntityFrameworkCore;
 namespace GrupoJap.Rentals.Controllers;
 
 /// <summary>
-/// Gestão dos textos do site público em PT/EN/ES. Ao guardar, a cache de traduções é descartada;
-/// o site (outro processo) recarrega-a sozinho em poucos segundos (Translations:CacheSeconds).
+/// Gestão dos textos do painel em PT/EN/ES. Ao guardar, a cache de traduções é descartada,
+/// por isso a alteração aparece logo no pedido seguinte.
 /// </summary>
 [Authorize(Roles = AppRoles.Admin)]
 [Route("translations")]
-public sealed class TranslationsController(ApplicationDbContext dbContext, TranslationStore store) : Controller
+public sealed class TranslationsController(ApplicationDbContext dbContext, TranslationStore store, Translator T) : Controller
 {
     [HttpGet("")]
     public async Task<IActionResult> Index([FromQuery] TranslationIndexViewModel filters)
@@ -75,7 +75,7 @@ public sealed class TranslationsController(ApplicationDbContext dbContext, Trans
         ValidateValues(model);
         if (ModelState.IsValid && await dbContext.Translations.AnyAsync(t => t.Key == model.Key))
         {
-            ModelState.AddModelError(nameof(model.Key), "Já existe uma tradução com esta chave.");
+            ModelState.AddModelError(nameof(model.Key), T["validation.translation_duplicate"]);
         }
 
         if (!ModelState.IsValid)
@@ -97,7 +97,7 @@ public sealed class TranslationsController(ApplicationDbContext dbContext, Trans
         await dbContext.SaveChangesAsync();
         store.Invalidate();
 
-        TempData["SuccessMessage"] = $"Tradução \"{translation.Key}\" criada. Usa @T[\"{translation.Key}\"] numa vista para a mostrar no site.";
+        TempData["SuccessMessage"] = T["msg.translation_created", translation.Key].Value;
         return RedirectToAction(nameof(Index), new { category = translation.Category });
     }
 
@@ -151,7 +151,7 @@ public sealed class TranslationsController(ApplicationDbContext dbContext, Trans
         await dbContext.SaveChangesAsync();
         store.Invalidate();
 
-        TempData["SuccessMessage"] = $"Tradução \"{translation.Key}\" atualizada. O site mostra o novo texto em poucos segundos.";
+        TempData["SuccessMessage"] = T["msg.translation_updated", translation.Key].Value;
         return SafeReturnUrl(returnUrl) is { } url ? LocalRedirect(url) : RedirectToAction(nameof(Index));
     }
 
@@ -182,9 +182,7 @@ public sealed class TranslationsController(ApplicationDbContext dbContext, Trans
         await dbContext.SaveChangesAsync();
         store.Invalidate();
 
-        TempData["SuccessMessage"] = TranslationCatalog.Find(translation.Key) is not null
-            ? $"Tradução \"{translation.Key}\" eliminada. O site volta a usar o texto original, que será reposto na base de dados no próximo arranque."
-            : $"Tradução \"{translation.Key}\" eliminada.";
+        TempData["SuccessMessage"] = T[TranslationCatalog.Find(translation.Key) is not null ? "msg.translation_reset" : "msg.translation_deleted", translation.Key].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -192,7 +190,7 @@ public sealed class TranslationsController(ApplicationDbContext dbContext, Trans
     {
         if (string.IsNullOrWhiteSpace(model.Values.GetValueOrDefault(SiteLanguages.Default)))
         {
-            ModelState.AddModelError($"Values[{SiteLanguages.Default}]", "O texto em português é obrigatório (é o idioma de recurso).");
+            ModelState.AddModelError($"Values[{SiteLanguages.Default}]", T["validation.translation_pt_required"]);
         }
     }
 

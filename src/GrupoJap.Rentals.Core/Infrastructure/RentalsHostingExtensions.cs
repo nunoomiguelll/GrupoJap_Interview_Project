@@ -12,10 +12,10 @@ using System.Globalization;
 
 namespace GrupoJap.Rentals.Infrastructure;
 
-/// <summary>Configuração comum às duas aplicações (site público e administração): base de dados, Identity e uploads.</summary>
+/// <summary>Configuração da aplicação de administração: base de dados, Identity, traduções e uploads.</summary>
 public static class RentalsHostingExtensions
 {
-    /// <param name="appName">Prefixo usado nos cookies, para que o site e a administração tenham sessões independentes.</param>
+    /// <param name="appName">Prefixo usado nos cookies de sessão.</param>
     public static IServiceCollection AddRentalsCore(this IServiceCollection services, IConfiguration configuration, string appName)
     {
         services.AddDbContext<ApplicationDbContext>(options =>
@@ -48,7 +48,6 @@ public static class RentalsHostingExtensions
 
         services.AddScoped<AvatarStorage>();
         services.AddScoped<RentalAvailabilityService>();
-        services.AddScoped<BookingService>();
 
         // Traduções: guardadas na base de dados e usadas pelas vistas (@T["chave"]) e pelas DataAnnotations.
         services.AddSingleton<TranslationStore>();
@@ -67,57 +66,29 @@ public static class RentalsHostingExtensions
     }
 
     /// <summary>
-    /// Define o idioma de cada pedido. Com <paramref name="multilingual"/> (site público), usa o cookie de idioma
-    /// e depois o idioma do browser; caso contrário (administração), fica sempre em português.
+    /// Define o idioma de cada pedido a partir do cookie de idioma (<see cref="LanguageCookieName"/>), escolhido no
+    /// seletor do painel. Sem escolha, usa o português, que é o idioma base.
     /// </summary>
-    public static IApplicationBuilder UseRentalsLocalization(this WebApplication app, bool multilingual)
+    public static IApplicationBuilder UseRentalsLocalization(this WebApplication app)
     {
-        var cultures = (multilingual ? SiteLanguages.All : SiteLanguages.All.Where(l => l.Code == SiteLanguages.Default))
-            .Select(language => new CultureInfo(language.Culture))
-            .ToList();
+        var cultures = SiteLanguages.All.Select(language => new CultureInfo(language.Culture)).ToList();
 
         var options = new RequestLocalizationOptions
         {
-            DefaultRequestCulture = new RequestCulture(cultures[0]),
+            DefaultRequestCulture = new RequestCulture(SiteLanguages.DefaultLanguage.Culture),
             SupportedCultures = cultures,
-            SupportedUICultures = cultures,
-            FallBackToParentCultures = true,
-            FallBackToParentUICultures = true
+            SupportedUICultures = cultures
         };
 
-        if (!multilingual)
-        {
-            options.RequestCultureProviders.Clear();
-        }
-        else
-        {
-            // "en-US" ou "es-MX" no browser correspondem a en-GB e es-ES.
-            options.RequestCultureProviders.Insert(2, new LanguageCodeCultureProvider());
-            options.RequestCultureProviders.OfType<CookieRequestCultureProvider>().Single().CookieName = LanguageCookieName;
-        }
+        options.RequestCultureProviders.Clear();
+        options.RequestCultureProviders.Add(new CookieRequestCultureProvider { CookieName = LanguageCookieName });
 
         return app.UseRequestLocalization(options);
     }
 
     public const string LanguageCookieName = ".GrupoJap.Language";
 
-    /// <summary>Associa o idioma do browser (só as duas letras) à cultura suportada desse idioma.</summary>
-    private sealed class LanguageCodeCultureProvider : RequestCultureProvider
-    {
-        public override Task<ProviderCultureResult?> DetermineProviderCultureResult(HttpContext httpContext)
-        {
-            var header = httpContext.Request.GetTypedHeaders().AcceptLanguage;
-            var match = header
-                .OrderByDescending(value => value.Quality ?? 1)
-                .Select(value => value.Value.Value?.Split('-')[0].ToLowerInvariant())
-                .Select(code => SiteLanguages.All.FirstOrDefault(language => language.Code == code))
-                .FirstOrDefault(language => language is not null);
-
-            return Task.FromResult(match is null ? null : new ProviderCultureResult(match.Culture));
-        }
-    }
-
-    /// <summary>Serve /uploads a partir da pasta partilhada (Uploads:Path), comum ao site e à administração.</summary>
+    /// <summary>Serve /uploads a partir da pasta partilhada (Uploads:Path).</summary>
     public static IApplicationBuilder UseRentalsUploads(this WebApplication app)
     {
         var root = AvatarStorage.ResolveUploadsRoot(app.Environment, app.Configuration);

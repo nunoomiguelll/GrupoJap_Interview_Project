@@ -41,7 +41,7 @@ public sealed class Translator(TranslationStore store) : IStringLocalizer
     }
 
     /// <summary>Nome traduzido de um combustível (chaves <c>fuel.*</c>).</summary>
-    public string Fuel(FuelType fuel) => Resolve("fuel." + fuel, SiteLanguages.Current) ?? fuel.GetDisplayName();
+    public string Fuel(FuelType fuel) => Resolve("fuel." + fuel, SiteLanguages.Current) ?? fuel.ToString();
 
     private string? Resolve(string key, string language)
         => store.Find(language, key)

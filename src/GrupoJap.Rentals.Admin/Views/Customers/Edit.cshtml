@@ -1,21 +1,21 @@
 @model Customer
-@{ ViewData["Title"] = "Editar cliente"; }
+@{ ViewData["Title"] = T["customers.edit_title"].Value; }
 
 <section class="management-page form-page">
     <div class="page-heading management-heading">
         <div>
-            <p class="eyebrow">CLIENTES <span>·</span> EDIÇÃO</p>
-            <h1>Editar cliente</h1>
+            <partial name="_Eyebrow" model="@T["customers.eyebrow_edit"].Value" />
+            <h1>@T["customers.edit_title"]</h1>
             <p class="heading-copy">@Model.FullName</p>
         </div>
-        <a class="secondary-button" asp-action="Index"><span aria-hidden="true">←</span> Voltar aos clientes</a>
+        <a class="secondary-button" asp-action="Index"><span aria-hidden="true">←</span> @T["customers.back"]</a>
     </div>
 
     <form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="panel entity-form">
         <div asp-validation-summary="ModelOnly" class="form-errors" role="alert"></div>
         <input type="hidden" asp-for="Id" />
         <partial name="_Fields" model="Model" />
-        <div class="form-actions"><a class="secondary-button" asp-action="Index">Cancelar</a><button class="primary-button" type="submit">Guardar alterações <span aria-hidden="true">→</span></button></div>
+        <div class="form-actions"><a class="secondary-button" asp-action="Index">@T["common.cancel"]</a><button class="primary-button" type="submit">@T["common.save_changes"] <span aria-hidden="true">→</span></button></div>
     </form>
 </section>
 @section Scripts { <partial name="_FormScripts" /> }

@@ -1,26 +1,26 @@
 @model IReadOnlyList<GrupoJap.Rentals.ViewModels.CustomerListItemViewModel>
-@{ ViewData["Title"] = "Clientes"; }
+@{ ViewData["Title"] = T["nav.customers"].Value; }
 
 <section class="management-page">
     <div class="page-heading management-heading">
         <div>
-            <p class="eyebrow">OPERAÇÃO <span>·</span> CLIENTES</p>
-            <h1>Clientes</h1>
-            <p class="heading-copy">@Model.Count cliente(s) registado(s)</p>
+            <partial name="_Eyebrow" model="@T["customers.eyebrow"].Value" />
+            <h1>@T["nav.customers"]</h1>
+            <p class="heading-copy">@T["customers.count", Model.Count]</p>
         </div>
-        <a class="primary-button" asp-action="Create"><span aria-hidden="true">＋</span> Registar cliente</a>
+        <a class="primary-button" asp-action="Create"><span aria-hidden="true">＋</span> @T["customers.add"]</a>
     </div>
 
     <partial name="_Notices" />
 
-    <section class="panel management-panel" aria-label="Lista de clientes">
+    <section class="panel management-panel" aria-label="@T["customers.list_label"]">
         <div class="table-wrap">
             <table class="management-table">
-                <thead><tr><th>CLIENTE</th><th>TELEFONE</th><th>CARTA DE CONDUÇÃO</th><th>CONTRATOS</th><th>ESTADO</th><th></th></tr></thead>
+                <thead><tr><th>@T["customers.th_customer"]</th><th>@T["customers.th_phone"]</th><th>@T["customers.th_license"]</th><th>@T["customers.th_contracts"]</th><th>@T["common.th_status"]</th><th></th></tr></thead>
                 <tbody>
                 @if (Model.Count == 0)
                 {
-                    <tr><td colspan="6"><div class="empty-state"><span class="empty-mark" aria-hidden="true">—</span><strong>Ainda não há clientes</strong><span>Regista o primeiro cliente para criares contratos de aluguer.</span><a class="text-link" asp-action="Create">Registar cliente <span aria-hidden="true">→</span></a></div></td></tr>
+                    <tr><td colspan="6"><div class="empty-state"><span class="empty-mark" aria-hidden="true">—</span><strong>@T["customers.empty_title"]</strong><span>@T["customers.empty_text"]</span><a class="text-link" asp-action="Create">@T["customers.add"] <span aria-hidden="true">→</span></a></div></td></tr>
                 }
                 else
                 {
@@ -31,8 +31,8 @@
                             <td>@customer.Phone</td>
                             <td><span class="plate-number">@customer.DrivingLicenseNumber</span></td>
                             <td>@customer.ContractCount</td>
-                            <td><span class="rental-status @(customer.HasActiveRental ? "is-active" : "is-complete")"><i></i>@(customer.HasActiveRental ? "Com aluguer ativo" : "Sem aluguer ativo")</span></td>
-                            <td><div class="row-actions"><a asp-action="Edit" asp-route-id="@customer.Id">Editar</a><a class="is-danger" asp-action="Delete" asp-route-id="@customer.Id">Eliminar</a></div></td>
+                            <td><span class="rental-status @(customer.HasActiveRental ? "is-active" : "is-complete")"><i></i>@T[customer.HasActiveRental ? "customers.status_active" : "customers.status_none"]</span></td>
+                            <td><div class="row-actions"><a asp-action="Edit" asp-route-id="@customer.Id">@T["common.edit"]</a><a class="is-danger" asp-action="Delete" asp-route-id="@customer.Id">@T["common.delete"]</a></div></td>
                         </tr>
                     }
                 }

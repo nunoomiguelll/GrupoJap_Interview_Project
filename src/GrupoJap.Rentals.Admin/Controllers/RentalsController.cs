@@ -1,4 +1,5 @@
 using GrupoJap.Rentals.Data;
+using GrupoJap.Rentals.Localization;
 using GrupoJap.Rentals.Models;
 using GrupoJap.Rentals.Services;
 using GrupoJap.Rentals.ViewModels;
@@ -11,10 +12,8 @@ namespace GrupoJap.Rentals.Controllers;
 
 [Authorize(Roles = AppRoles.Admin)]
 [Route("rentals")]
-public sealed class RentalsController(ApplicationDbContext dbContext, RentalAvailabilityService availability) : Controller
+public sealed class RentalsController(ApplicationDbContext dbContext, RentalAvailabilityService availability, Translator T) : Controller
 {
-    private const string OverlapMessage = "Este veículo já tem um contrato que se sobrepõe ao período indicado.";
-
     [HttpGet("")]
     public async Task<IActionResult> Index()
     {
@@ -78,7 +77,7 @@ public sealed class RentalsController(ApplicationDbContext dbContext, RentalAvai
         dbContext.RentalContracts.Add(contract);
         await dbContext.SaveChangesAsync();
 
-        TempData["SuccessMessage"] = "Contrato de aluguer registado com sucesso.";
+        TempData["SuccessMessage"] = T["msg.rental_created"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -131,7 +130,7 @@ public sealed class RentalsController(ApplicationDbContext dbContext, RentalAvai
         existing.InitialMileage = contract.InitialMileage;
         await dbContext.SaveChangesAsync();
 
-        TempData["SuccessMessage"] = "Contrato de aluguer atualizado com sucesso.";
+        TempData["SuccessMessage"] = T["msg.rental_updated"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -160,7 +159,7 @@ public sealed class RentalsController(ApplicationDbContext dbContext, RentalAvai
         dbContext.RentalContracts.Remove(contract);
         await dbContext.SaveChangesAsync();
 
-        TempData["SuccessMessage"] = "Contrato de aluguer eliminado com sucesso.";
+        TempData["SuccessMessage"] = T["msg.rental_deleted"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -168,19 +167,19 @@ public sealed class RentalsController(ApplicationDbContext dbContext, RentalAvai
     {
         if (contract.CustomerId is int customerId && !await dbContext.Customers.AnyAsync(c => c.Id == customerId))
         {
-            ModelState.AddModelError(nameof(RentalContract.CustomerId), "O cliente selecionado não existe.");
+            ModelState.AddModelError(nameof(RentalContract.CustomerId), T["validation.customer_missing"]);
         }
 
         if (contract.VehicleId is int vehicleId && !await dbContext.Vehicles.AnyAsync(v => v.Id == vehicleId))
         {
-            ModelState.AddModelError(nameof(RentalContract.VehicleId), "O veículo selecionado não existe.");
+            ModelState.AddModelError(nameof(RentalContract.VehicleId), T["validation.vehicle_missing"]);
         }
 
         if (contract.VehicleId is int vid && contract.StartDate is DateOnly start && contract.EndDate is DateOnly end && end > start)
         {
             if (await availability.HasOverlapAsync(vid, start, end, currentId))
             {
-                ModelState.AddModelError(nameof(RentalContract.VehicleId), OverlapMessage);
+                ModelState.AddModelError(nameof(RentalContract.VehicleId), T["validation.rental_overlap"]);
             }
         }
     }

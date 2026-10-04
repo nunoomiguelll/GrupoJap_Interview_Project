@@ -1,4 +1,5 @@
 using GrupoJap.Rentals.Data;
+using GrupoJap.Rentals.Localization;
 using GrupoJap.Rentals.Models;
 using GrupoJap.Rentals.Services;
 using GrupoJap.Rentals.ViewModels;
@@ -11,10 +12,8 @@ namespace GrupoJap.Rentals.Controllers;
 
 [Authorize(Roles = AppRoles.Admin)]
 [Route("vehicles")]
-public sealed class VehiclesController(ApplicationDbContext dbContext) : Controller
+public sealed class VehiclesController(ApplicationDbContext dbContext, Translator T) : Controller
 {
-    private const string DuplicateMessage = "Já existe um veículo com esta matrícula.";
-
     [HttpGet("")]
     public async Task<IActionResult> Index()
     {
@@ -50,7 +49,7 @@ public sealed class VehiclesController(ApplicationDbContext dbContext) : Control
 
         if (await dbContext.Vehicles.AnyAsync(existing => existing.Registration == vehicle.Registration))
         {
-            ModelState.AddModelError(nameof(vehicle.Registration), DuplicateMessage);
+            ModelState.AddModelError(nameof(vehicle.Registration), T["validation.vehicle_duplicate"]);
         }
 
         if (!ModelState.IsValid)
@@ -65,7 +64,7 @@ public sealed class VehiclesController(ApplicationDbContext dbContext) : Control
             return View(vehicle);
         }
 
-        TempData["SuccessMessage"] = "Veículo registado com sucesso.";
+        TempData["SuccessMessage"] = T["msg.vehicle_created"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -95,7 +94,7 @@ public sealed class VehiclesController(ApplicationDbContext dbContext) : Control
 
         if (await dbContext.Vehicles.AnyAsync(v => v.Registration == vehicle.Registration && v.Id != id))
         {
-            ModelState.AddModelError(nameof(vehicle.Registration), DuplicateMessage);
+            ModelState.AddModelError(nameof(vehicle.Registration), T["validation.vehicle_duplicate"]);
         }
 
         if (!ModelState.IsValid)
@@ -115,7 +114,7 @@ public sealed class VehiclesController(ApplicationDbContext dbContext) : Control
             return View(vehicle);
         }
 
-        TempData["SuccessMessage"] = "Veículo atualizado com sucesso.";
+        TempData["SuccessMessage"] = T["msg.vehicle_updated"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -144,14 +143,14 @@ public sealed class VehiclesController(ApplicationDbContext dbContext) : Control
 
         if (await dbContext.RentalContracts.AnyAsync(r => r.VehicleId == id))
         {
-            TempData["ErrorMessage"] = "Não é possível eliminar um veículo com contratos de aluguer associados.";
+            TempData["ErrorMessage"] = T["msg.vehicle_delete_blocked"].Value;
             return RedirectToAction(nameof(Index));
         }
 
         dbContext.Vehicles.Remove(vehicle);
         await dbContext.SaveChangesAsync();
 
-        TempData["SuccessMessage"] = "Veículo eliminado com sucesso.";
+        TempData["SuccessMessage"] = T["msg.vehicle_deleted"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -171,7 +170,7 @@ public sealed class VehiclesController(ApplicationDbContext dbContext) : Control
         }
         catch (DbUpdateException exception) when (exception.InnerException is SqlException { Number: 2601 or 2627 })
         {
-            ModelState.AddModelError(nameof(vehicle.Registration), DuplicateMessage);
+            ModelState.AddModelError(nameof(vehicle.Registration), T["validation.vehicle_duplicate"]);
             return false;
         }
     }

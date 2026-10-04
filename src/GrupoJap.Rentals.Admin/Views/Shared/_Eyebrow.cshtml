@@ -1,0 +1,4 @@
+@* Texto do "eyebrow": as partes separadas por " · " ficam com o ponto destacado. *@
+@model string
+@{ var parts = Model.Split(" · "); }
+<p class="eyebrow">@for (var i = 0; i < parts.Length; i++) { if (i > 0) { <text> </text><span>·</span><text> </text> } @parts[i] }</p>

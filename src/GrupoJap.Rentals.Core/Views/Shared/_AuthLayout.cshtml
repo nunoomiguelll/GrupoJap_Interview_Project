@@ -1,16 +1,9 @@
-@inject IConfiguration Configuration
-@{
-    // O modo noturno só existe na administração (Ui:DarkMode); no site público a página fica sempre clara.
-    var darkModeEnabled = Configuration.GetValue<bool>("Ui:DarkMode");
-}
 <!DOCTYPE html>
 <html lang="@SiteLanguages.CurrentLanguage.Culture" data-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f4f5f0" />
-    @if (darkModeEnabled)
-    {
     <script>
         (function () {
             var theme = null;
@@ -21,7 +14,6 @@
             document.documentElement.dataset.theme = theme;
         })();
     </script>
-    }
     <title>@ViewData["Title"] · GrupoJap Rentals</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -29,10 +21,10 @@
     <link rel="stylesheet" href="~/_content/GrupoJap.Rentals.Core/css/site.css" asp-append-version="true" />
 </head>
 <body class="auth-body">
-    @if (darkModeEnabled)
-    {
-    <button class="icon-button theme-toggle auth-theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Ativar modo noturno" title="Alternar modo noturno"><svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg><svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2.5 12h2M19.5 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg></button>
-    }
+    <div class="auth-toolbar">
+        <partial name="_LanguageMenu" />
+        <button class="icon-button theme-toggle" type="button" data-theme-toggle data-label-dark="@T["theme.to_dark"]" data-label-light="@T["theme.to_light"]" aria-pressed="false" aria-label="@T["theme.to_dark"]" title="@T["theme.toggle"]"><svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg><svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2.5 12h2M19.5 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg></button>
+    </div>
     <main class="auth-shell" role="main">
         <a class="auth-brand" href="~/" aria-label="GrupoJap Rentals">
             <span class="brand-mark" aria-hidden="true"><span></span><span></span></span>

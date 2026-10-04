@@ -1,4 +1,5 @@
 using GrupoJap.Rentals.Data;
+using GrupoJap.Rentals.Localization;
 using GrupoJap.Rentals.Models;
 using GrupoJap.Rentals.Services;
 using GrupoJap.Rentals.ViewModels;
@@ -11,10 +12,8 @@ namespace GrupoJap.Rentals.Controllers;
 
 [Authorize(Roles = AppRoles.Admin)]
 [Route("customers")]
-public sealed class CustomersController(ApplicationDbContext dbContext) : Controller
+public sealed class CustomersController(ApplicationDbContext dbContext, Translator T) : Controller
 {
-    private const string DuplicateMessage = "Já existe um cliente com este email.";
-
     [HttpGet("")]
     public async Task<IActionResult> Index()
     {
@@ -48,7 +47,7 @@ public sealed class CustomersController(ApplicationDbContext dbContext) : Contro
 
         if (await dbContext.Customers.AnyAsync(c => c.Email == customer.Email))
         {
-            ModelState.AddModelError(nameof(customer.Email), DuplicateMessage);
+            ModelState.AddModelError(nameof(customer.Email), T["validation.customer_duplicate"]);
         }
 
         if (!ModelState.IsValid)
@@ -63,7 +62,7 @@ public sealed class CustomersController(ApplicationDbContext dbContext) : Contro
             return View(customer);
         }
 
-        TempData["SuccessMessage"] = "Cliente registado com sucesso.";
+        TempData["SuccessMessage"] = T["msg.customer_created"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -93,7 +92,7 @@ public sealed class CustomersController(ApplicationDbContext dbContext) : Contro
 
         if (await dbContext.Customers.AnyAsync(c => c.Email == customer.Email && c.Id != id))
         {
-            ModelState.AddModelError(nameof(customer.Email), DuplicateMessage);
+            ModelState.AddModelError(nameof(customer.Email), T["validation.customer_duplicate"]);
         }
 
         if (!ModelState.IsValid)
@@ -111,7 +110,7 @@ public sealed class CustomersController(ApplicationDbContext dbContext) : Contro
             return View(customer);
         }
 
-        TempData["SuccessMessage"] = "Cliente atualizado com sucesso.";
+        TempData["SuccessMessage"] = T["msg.customer_updated"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -140,14 +139,14 @@ public sealed class CustomersController(ApplicationDbContext dbContext) : Contro
 
         if (await dbContext.RentalContracts.AnyAsync(r => r.CustomerId == id))
         {
-            TempData["ErrorMessage"] = "Não é possível eliminar um cliente com contratos de aluguer associados.";
+            TempData["ErrorMessage"] = T["msg.customer_delete_blocked"].Value;
             return RedirectToAction(nameof(Index));
         }
 
         dbContext.Customers.Remove(customer);
         await dbContext.SaveChangesAsync();
 
-        TempData["SuccessMessage"] = "Cliente eliminado com sucesso.";
+        TempData["SuccessMessage"] = T["msg.customer_deleted"].Value;
         return RedirectToAction(nameof(Index));
     }
 
@@ -168,7 +167,7 @@ public sealed class CustomersController(ApplicationDbContext dbContext) : Contro
         }
         catch (DbUpdateException exception) when (exception.InnerException is SqlException { Number: 2601 or 2627 })
         {
-            ModelState.AddModelError(nameof(customer.Email), DuplicateMessage);
+            ModelState.AddModelError(nameof(customer.Email), T["validation.customer_duplicate"]);
             return false;
         }
     }
