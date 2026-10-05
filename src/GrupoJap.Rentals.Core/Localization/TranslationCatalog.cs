@@ -51,7 +51,6 @@ public static class TranslationCatalog
         new("error.request_id", Common, "Página de erro", "ID do pedido", "Request ID", "ID de la solicitud"),
 
         // ---------- Menu e layout ----------
-        new("brand.label", Layout, "Texto do logótipo para leitores de ecrã", "GrupoJap Rentals, painel", "GrupoJap Rentals, dashboard", "GrupoJap Rentals, panel"),
         new("nav.label", Layout, null, "Navegação principal", "Main navigation", "Navegación principal"),
         new("nav.operation", Layout, "Título da secção do menu", "OPERAÇÃO", "OPERATIONS", "OPERACIÓN"),
         new("nav.system", Layout, "Título da secção do menu", "SISTEMA", "SYSTEM", "SISTEMA"),
@@ -382,7 +381,7 @@ public static class TranslationCatalog
         "account.error.duplicate",
         "field.confirm_password", "validation.confirm_password",
         "field.phone_placeholder", "validation.phone_format",
-        "sidebar.db_status"
+        "sidebar.db_status", "brand.label"
     ];
 
     public static bool IsRetired(string key)

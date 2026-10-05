@@ -1,7 +1,10 @@
 @model GrupoJap.Rentals.ViewModels.DashboardViewModel
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
 
 @{
     ViewData["Title"] = T["dash.title"].Value;
+    var currentUser = await UserManager.GetUserAsync(User);
 }
 
 <section class="dashboard" id="overview">
@@ -11,7 +14,7 @@
             <h1>@T["dash.heading"]</h1>
             <p class="heading-copy">@T["dash.lead"]</p>
         </div>
-        <div class="heading-mark" aria-hidden="true"><span>GJ</span><i></i></div>
+        <a class="heading-mark" asp-controller="Profile" asp-action="Index" title="@T["nav.my_profile"]">@if (!string.IsNullOrEmpty(currentUser?.PhotoPath)) { <img src="@currentUser.PhotoPath" alt="@T["profile.photo_alt"]" /> } else { <span>@(currentUser?.Initial ?? "?")</span> }</a>
     </div>
 
     <section class="metric-grid" aria-label="@T["dash.metrics_label"]">
@@ -95,5 +98,5 @@
         </article>
     </section>
 
-    <footer class="dashboard-footer"><span>GRUPOJAP RENTALS</span><span>@T["dash.footer_management"] <i>·</i> @DateTime.Today.Year</span></footer>
+    <footer class="dashboard-footer"><span>FLEET OPERATIONS</span><span>@T["dash.footer_management"] <i>·</i> @DateTime.Today.Year</span></footer>
 </section>
