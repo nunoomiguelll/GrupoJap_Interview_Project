@@ -81,7 +81,6 @@
             }
 
             <div class="sidebar-bottom">
-                <div class="connection-state"><span class="connection-dot"></span><span><strong>SQL Server</strong><small>@T["sidebar.db_status"]</small></span></div>
                 @if (currentUser is not null)
                 {
                     var roleLabel = !string.IsNullOrWhiteSpace(currentUser.JobTitle) ? currentUser.JobTitle : T[User.IsInRole("Admin") ? "profile.role_admin" : "profile.role_user"].Value;

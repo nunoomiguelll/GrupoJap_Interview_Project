@@ -72,7 +72,6 @@ public static class TranslationCatalog
         new("nav.logout", Layout, null, "Terminar sessão", "Sign out", "Cerrar sesión"),
         new("nav.login", Layout, null, "Entrar", "Sign in", "Iniciar sesión"),
         new("nav.language", Layout, "Seletor de idioma", "Idioma", "Language", "Idioma"),
-        new("sidebar.db_status", Layout, "Estado da ligação à base de dados", "Ligação ativa", "Connection active", "Conexión activa"),
         new("theme.to_dark", Layout, "Botão do modo noturno", "Ativar modo noturno", "Enable dark mode", "Activar modo oscuro"),
         new("theme.to_light", Layout, "Botão do modo noturno", "Ativar modo claro", "Enable light mode", "Activar modo claro"),
         new("theme.toggle", Layout, "Dica do botão do modo noturno", "Alternar modo noturno", "Toggle dark mode", "Alternar modo oscuro"),
@@ -382,7 +381,8 @@ public static class TranslationCatalog
         "account.create", "account.login.no_account", "account.register.eyebrow", "account.register.lead", "account.register.has_account",
         "account.error.duplicate",
         "field.confirm_password", "validation.confirm_password",
-        "field.phone_placeholder", "validation.phone_format"
+        "field.phone_placeholder", "validation.phone_format",
+        "sidebar.db_status"
     ];
 
     public static bool IsRetired(string key)

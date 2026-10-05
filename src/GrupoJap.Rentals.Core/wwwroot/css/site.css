@@ -91,12 +91,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .nav-link.is-unavailable { cursor: not-allowed; opacity: 0.64; }
 .nav-link.is-unavailable small { margin-left: auto; color: #cdb9b6; font-family: "DM Mono", monospace; font-size: 8px; letter-spacing: 0.5px; }
 .sidebar-bottom { display: grid; gap: 18px; margin-top: auto; }
-.connection-state { display: flex; align-items: center; gap: 9px; margin: 0 10px; padding: 13px 0 16px; border-bottom: 1px solid #ffffff1c; }
-.connection-dot, .metric-status, .legend-dot { display: inline-block; width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; }
-.connection-dot { background: #a8d66d; box-shadow: 0 0 0 3px #a8d66d22; }
-.connection-state > span:last-child { display: grid; gap: 3px; }
-.connection-state strong { font-size: 10px; font-weight: 600; }
-.connection-state small { color: #c9b3b0; font-size: 9px; }
+.metric-status, .legend-dot { display: inline-block; width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; }
 .user-profile { display: flex; align-items: center; gap: 10px; padding: 9px 8px; border-radius: 6px; background: #ffffff0b; }
 .user-avatar { width: 32px; height: 32px; background: #f2dcdc; color: var(--brand-dark); }
 .profile-more { margin-left: auto; color: #cdb9b6; letter-spacing: 2px; }
